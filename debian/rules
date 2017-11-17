@@ -1,0 +1,18 @@
+#!/usr/bin/make -f
+
+export DH_VERBOSE=1
+export PYBUILD_NAME=druid_exporter
+
+DEBPKGNAME ?= $(shell dpkg-parsechangelog | sed -n -e 's/^Source: //p')
+
+%:
+	dh $@ --with python3,systemd --buildsystem=pybuild
+
+override_dh_installinit:
+	true
+
+override_dh_auto_install:
+	dh_auto_install
+	# Rename the binary to match the debian package.
+	mv -v debian/$(DEBPKGNAME)/usr/bin/druid_exporter \
+            debian/$(DEBPKGNAME)/usr/bin/$(DEBPKGNAME)
