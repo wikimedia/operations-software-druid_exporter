@@ -11,7 +11,7 @@ The easiest way to run `druid_exporter` is via a virtualenv:
   .venv/bin/python setup.py
   .venv/bin/druid_exporter
 
-By default metrics are exposed on TCP port `8000`.
+By default metrics are exposed on TCP port `8000`. Python 2 is not supported.
 
 ## Druid versions supported
 
