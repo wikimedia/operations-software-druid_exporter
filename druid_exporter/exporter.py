@@ -14,7 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
 import argparse
 import json
 import logging
@@ -30,21 +29,23 @@ SUPPORTED_DAEMONS = ('broker', 'historical', 'coordinator')
 
 class DruidWSGIApp(object):
 
-    def __init__(self, post_uri, druid_collector, prometheus_app):
+    def __init__(self, post_uri, druid_collector, prometheus_app, encoding):
         self.prometheus_app = prometheus_app
         self.druid_collector = druid_collector
         self.post_uri = post_uri
+        self.encoding = encoding
 
     def __call__(self, environ, start_response):
         if (environ['REQUEST_METHOD'] == 'GET' and
                 environ['PATH_INFO'] == '/metrics'):
             return self.prometheus_app(environ, start_response)
         elif (environ['REQUEST_METHOD'] == 'POST' and
-                environ['PATH_INFO'] == self.post_uri):
+                environ['PATH_INFO'] == self.post_uri and
+                environ['CONTENT_TYPE'] == 'application/json'):
             try:
                 request_body_size = int(environ.get('CONTENT_LENGTH', 0))
                 request_body = environ['wsgi.input'].read(request_body_size)
-                datapoints = json.loads(request_body)
+                datapoints = json.loads(request_body.decode(self.encoding))
                 # The HTTP metrics emitter can batch datapoints and send them to
                 # a specific endpoint stated in the logs (this tool).
                 for datapoint in datapoints:
@@ -68,6 +69,8 @@ def main():
                         help='The URI to check for POSTs coming from Druid')
     parser.add_argument('-d', '--debug', action='store_true',
                         help='Enable debug logging')
+    parser.add_argument('-e', '--encoding', default='utf-8',
+                        help='Encoding of the Druid POST JSON data.')
     parser.add_argument('-c', '--collect-from',
                         type=str, default='all',
                         help="Comma separated list of daemons to collect "
@@ -99,7 +102,8 @@ def main():
     druid_collector = collector.DruidCollector(daemons)
     REGISTRY.register(druid_collector)
     prometheus_app = make_wsgi_app()
-    druid_wsgi_app = DruidWSGIApp(args.uri, druid_collector, prometheus_app)
+    druid_wsgi_app = DruidWSGIApp(args.uri, druid_collector,
+                                  prometheus_app, args.encoding)
 
     httpd = make_server(address, int(port), druid_wsgi_app)
     httpd.serve_forever()
