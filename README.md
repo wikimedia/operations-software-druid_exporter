@@ -36,8 +36,6 @@ This exporter is supposed to be run on each host running a Druid daemon.
 ### Broker, Historical (histograms)
 * `query/time` [datasource]
 * `query/bytes` [datasource]
-* `query/node/time` [datasource, server]
-* `query/node/bytes` [datasource, server]
 * `query/cache/total/numEntries`
 * `query/cache/total/sizeBytes`
 * `query/cache/total/hits`

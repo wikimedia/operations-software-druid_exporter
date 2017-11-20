@@ -38,8 +38,6 @@ class DruidCollector(object):
             # Broker, Historical
             'query/time': ['dataSource'],
             'query/bytes': ['dataSource'],
-            'query/node/time': ['dataSource', 'server'],
-            'query/node/bytes': ['dataSource', 'server'],
             'query/cache/total/numEntries': None,
             'query/cache/total/sizeBytes': None,
             'query/cache/total/hits': None,
@@ -74,8 +72,6 @@ class DruidCollector(object):
         self.metric_buckets = {
             'query/time': ['10', '100', '500', '1000', '10000', 'inf', 'sum'],
             'query/bytes': ['10', '100', '500', '1000', '10000', 'inf', 'sum'],
-            'query/node/time': ['10', '100', '500', '1000', '10000', 'inf', 'sum'],
-            'query/node/bytes': ['10', '100', '500', '1000', '10000', 'inf', 'sum'],
         }
 
         # Data structure holding histogram data
@@ -84,8 +80,6 @@ class DruidCollector(object):
         self.histograms_metrics = set([
             'query/time',
             'query/bytes',
-            'query/node/time',
-            'query/node/bytes',
         ])
 
         # Data structure holding counters data
@@ -137,17 +131,7 @@ class DruidCollector(object):
                'druid_' + daemon + '_query_bytes',
                'Number of bytes returned in query response.',
                labels=['datasource']),
-           'query/node/time': HistogramMetricFamily(
-               'druid_' + daemon + '_query_node_time_ms',
-               'Milliseconds taken to query individual '
-               'historical/realtime nodes.',
-               labels=['datasource', 'server']),
-           'query/node/bytes': HistogramMetricFamily(
-               'druid_' + daemon + '_query_node_bytes',
-               'number of bytes returned from querying individual '
-               'historical/realtime nodes.',
-               labels=['datasource', 'server']),
-            }
+        }
 
     def _get_cache_counters(self, daemon):
         return {
