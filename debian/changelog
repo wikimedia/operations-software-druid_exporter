@@ -1,3 +1,14 @@
+prometheus-druid-exporter (0.3-1) unstable; urgency=low
+
+  * Fix decoding of JSON data in python3
+  * Drop support for Python 2 to simplify the code maintenance.
+  * Add the --encoding parameter (default to utf-8) to allow a user
+    to instruct what encoding the druid exporter should expect to use
+    when decoding POST data coming from Druid. The documentation
+    seems to suggest that UTF-8 is the preferred one.
+
+ -- Luca Toscano <ltoscano@wikimedia.org>  Mon, 20 Nov 2017 12:53:36 +0000
+
 prometheus-druid-exporter (0.2-1) unstable; urgency=low
 
   * Fix import of local libraries for python3
