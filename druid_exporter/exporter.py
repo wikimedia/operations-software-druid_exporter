@@ -14,15 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
 import argparse
 import json
 import logging
 import sys
 
-import collector
 from prometheus_client import generate_latest, make_wsgi_app, REGISTRY
 from wsgiref.simple_server import make_server
-
+from . import collector
 
 log = logging.getLogger(__name__)
 SUPPORTED_DAEMONS = ('broker', 'historical', 'coordinator')
