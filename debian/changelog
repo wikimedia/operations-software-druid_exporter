@@ -1,3 +1,9 @@
+prometheus-druid-exporter (0.4-1) unstable; urgency=low
+
+  * Remove unused query/node/* metrics support.
+
+ -- Luca Toscano <ltoscano@wikimedia.org>  Tue, 21 Nov 2017 10:53:36 +0000
+
 prometheus-druid-exporter (0.3-1) unstable; urgency=low
 
   * Fix decoding of JSON data in python3
