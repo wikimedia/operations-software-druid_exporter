@@ -27,7 +27,7 @@ class DruidCollector(object):
     scrape_duration = Summary(
             'druid_scrape_duration_seconds', 'Druid scrape duration')
 
-    def __init__(self, allowed_daemons):
+    def __init__(self):
         # Datapoints successfully registered
         self.datapoints_registered = 0
 
@@ -130,8 +130,6 @@ class DruidCollector(object):
             'ingest/handoff/failed',
             'ingest/handoff/count',
         ])
-
-        self.allowed_daemons = allowed_daemons
 
     @staticmethod
     def sanitize_field(datapoint_field):
@@ -360,8 +358,8 @@ class DruidCollector(object):
 
     @scrape_duration.time()
     def collect(self):
-        # Metrics common to Broker and Historical
-        for daemon in ['broker', 'historical']:
+        # Metrics common to Broker, Historical and Peon
+        for daemon in ['broker', 'historical', 'peon']:
             query_metrics = self._get_query_histograms(daemon)
             cache_metrics = self._get_cache_counters(daemon)
 
@@ -376,6 +374,10 @@ class DruidCollector(object):
                             [datasource], buckets=buckets_without_sum,
                             sum_value=self.histograms[metric][daemon][datasource]['sum'])
                     yield query_metrics[metric]
+
+        # Metrics common to Broker and Historical
+        for daemon in ['broker', 'historical']:
+            cache_metrics = self._get_cache_counters(daemon)
 
             for metric in cache_metrics:
                 if not self.counters[metric] or daemon not in self.counters[metric]:
@@ -429,14 +431,6 @@ class DruidCollector(object):
                       "because the 'feed' field is not 'metrics' or "
                       "the metric itself is not supported: {}"
                       .format(datapoint))
-            return
-
-        # Transform the metric name into a metrics' key
-        daemon_name = DruidCollector.sanitize_field(str(datapoint['service']))
-
-        if daemon_name not in self.allowed_daemons:
-            log.error('Received metric from a daemon that is not allowed ({}), '
-                      'dropping it.'.format(daemon_name))
             return
 
         metric_name = str(datapoint['metric'])

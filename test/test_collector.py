@@ -22,7 +22,7 @@ from druid_exporter.collector import DruidCollector
 class TestDruidCollector(unittest.TestCase):
 
     def setUp(self):
-        self.collector = DruidCollector(['coordinator', 'historical', 'broker', 'peon'])
+        self.collector = DruidCollector()
         self.metrics_without_labels = [
             'druid_historical_segment_scan_pending',
             'druid_historical_max_segment_bytes',
@@ -188,6 +188,28 @@ class TestDruidCollector(unittest.TestCase):
              "id": "b09649a1-a440-463f-8b7e-6b476cc22d45",
              "interval": ["0000-01-01T00:00:00.000Z/3000-01-01T00:00:00.000Z"],
              "remoteAddress": "10.64.53.26", "success": "true",
+             "type": "timeBoundary", "version": "0.9.2"},
+
+            {"feed": "metrics", "timestamp": "2017-12-06T11:59:35.682Z",
+             "service": "druid/peon", "host": "druid1001.eqiad.wmnet:8101",
+             "metric": "query/time", "value": 9,
+             "context": "{\"finalize\":false}",
+             "dataSource": "banner_activity_minutely",
+             "duration": "PT3600S", "hasFilters": "false",
+             "id": "aab8a8af-f338-42af-86da-ffdc05a2bcd2",
+             "interval": ["2017-12-06T11:00:00.000Z/2017-12-06T12:00:00.000Z"],
+             "remoteAddress": "10.64.5.101", "success": "true",
+             "type": "timeBoundary", "version": "0.9.2"},
+
+            {"feed": "metrics", "timestamp": "2017-12-06T11:59:35.682Z",
+             "service": "druid/peon", "host": "druid1001.eqiad.wmnet:8101",
+             "metric": "query/bytes", "value": 85,
+             "context": "{\"finalize\":false}",
+             "dataSource": "banner_activity_minutely",
+             "duration": "PT3600S", "hasFilters": "false",
+             "id": "aab8a8af-f338-42af-86da-ffdc05a2bcd2",
+             "interval": ["2017-12-06T11:00:00.000Z/2017-12-06T12:00:00.000Z"],
+             "remoteAddress": "10.64.5.101",
              "type": "timeBoundary", "version": "0.9.2"},
 
             {"feed": "metrics", "timestamp": "2017-11-14T13:11:55.581Z",
