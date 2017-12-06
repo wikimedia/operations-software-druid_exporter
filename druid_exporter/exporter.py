@@ -24,7 +24,7 @@ from wsgiref.simple_server import make_server
 from . import collector
 
 log = logging.getLogger(__name__)
-SUPPORTED_DAEMONS = ('broker', 'historical', 'coordinator')
+SUPPORTED_DAEMONS = ('broker', 'historical', 'coordinator', 'peon')
 
 
 class DruidWSGIApp(object):

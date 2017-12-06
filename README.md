@@ -66,6 +66,20 @@ This exporter is supposed to be run on each host running a Druid daemon.
 * `segment/unavailable/count` [datasource]
 * `segment/underReplicated/count` [datasource, tier]
 
+### Peon (counters)
+* ingest/events/thrownAway [dataSource]
+* ingest/events/unparseable [dataSource]
+* ingest/events/processed [dataSource]
+* ingest/rows/output [dataSource]
+* ingest/persists/count [dataSource]
+* ingest/persists/failed [dataSource]
+* ingest/handoff/failed [dataSource]
+* ingest/handoff/count [dataSource]
+
+Realtime metrics have been tested only when emitted by Peons, since the Wikimedia
+use case (for the moment) is to use [Tranquillity](https://github.com/druid-io/tranquility)
+rather than Real Time nodes.
+
 Please check the following document for more info:
 http://druid.io/docs/0.9.2/operations/metrics.html
 
