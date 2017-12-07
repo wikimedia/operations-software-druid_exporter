@@ -24,7 +24,6 @@ from wsgiref.simple_server import make_server
 from . import collector
 
 log = logging.getLogger(__name__)
-SUPPORTED_DAEMONS = ('broker', 'historical', 'coordinator')
 
 
 class DruidWSGIApp(object):
@@ -71,12 +70,6 @@ def main():
                         help='Enable debug logging')
     parser.add_argument('-e', '--encoding', default='utf-8',
                         help='Encoding of the Druid POST JSON data.')
-    parser.add_argument('-c', '--collect-from',
-                        type=str, default='all',
-                        help="Comma separated list of daemons to collect "
-                             "metrics from. Default to the special value 'all', "
-                             "that corresponds to the list of supported daemons: {}"
-                             .format(SUPPORTED_DAEMONS))
     args = parser.parse_args()
 
     if args.debug:
@@ -86,20 +79,10 @@ def main():
 
     collect_metrics_from = []
 
-    if args.collect_from == 'all':
-        daemons = SUPPORTED_DAEMONS
-    else:
-        daemons = args.collect_from.split(',')
-        for daemon in daemons:
-            if daemon not in SUPPORTED_DAEMONS:
-                parser.error('The following daemon is not supported: {}'
-                             .format(daemon))
-                return 1
-
     address, port = args.listen.split(':', 1)
     log.info('Starting druid_exporter on %s:%s', address, port)
 
-    druid_collector = collector.DruidCollector(daemons)
+    druid_collector = collector.DruidCollector()
     REGISTRY.register(druid_collector)
     prometheus_app = make_wsgi_app()
     druid_wsgi_app = DruidWSGIApp(args.uri, druid_collector,

@@ -27,7 +27,7 @@ class DruidCollector(object):
     scrape_duration = Summary(
             'druid_scrape_duration_seconds', 'Druid scrape duration')
 
-    def __init__(self, allowed_daemons):
+    def __init__(self):
         # Datapoints successfully registered
         self.datapoints_registered = 0
 
@@ -64,6 +64,14 @@ class DruidCollector(object):
             'segment/size': ['dataSource'],
             'segment/unavailable/count': ['dataSource'],
             'segment/underReplicated/count': ['tier', 'dataSource'],
+            'ingest/events/thrownAway': ['dataSource'],
+            'ingest/events/unparseable': ['dataSource'],
+            'ingest/events/processed': ['dataSource'],
+            'ingest/rows/output': ['dataSource'],
+            'ingest/persists/count': ['dataSource'],
+            'ingest/persists/failed': ['dataSource'],
+            'ingest/handoff/failed': ['dataSource'],
+            'ingest/handoff/count': ['dataSource'],
         }
 
         # Buckets used when storing histogram metrics.
@@ -113,13 +121,56 @@ class DruidCollector(object):
             'segment/size',
             'segment/unavailable/count',
             'segment/underReplicated/count',
+            'ingest/events/thrownAway',
+            'ingest/events/unparseable',
+            'ingest/events/processed',
+            'ingest/rows/output',
+            'ingest/persists/count',
+            'ingest/persists/failed',
+            'ingest/handoff/failed',
+            'ingest/handoff/count',
         ])
-
-        self.allowed_daemons = allowed_daemons
 
     @staticmethod
     def sanitize_field(datapoint_field):
         return datapoint_field.replace('druid/', '').lower()
+
+    def _get_realtime_counters(self):
+        return {
+            'ingest/events/thrownAway': GaugeMetricFamily(
+               'druid_realtime_ingest_events_thrown_away_count',
+               'Number of events rejected because '
+               'they are outside the windowPeriod.',
+               labels=['datasource']),
+            'ingest/events/unparseable': GaugeMetricFamily(
+               'druid_realtime_ingest_events_unparseable_count',
+               'Number of events rejected because the events are unparseable.',
+               labels=['datasource']),
+            'ingest/events/processed': GaugeMetricFamily(
+               'druid_realtime_ingest_events_processed_count',
+               'Number of events successfully processed per emission period.',
+               labels=['datasource']),
+            'ingest/rows/output': GaugeMetricFamily(
+               'druid_realtime_ingest_rows_output_count',
+               'Number of Druid rows persisted.',
+               labels=['datasource']),
+            'ingest/persists/count': GaugeMetricFamily(
+               'druid_realtime_ingest_persists_count',
+               'Number of times persist occurred.',
+               labels=['datasource']),
+            'ingest/persists/failed': GaugeMetricFamily(
+               'druid_realtime_ingest_persists_failed_count',
+               'Number of times persist failed.',
+               labels=['datasource']),
+            'ingest/handoff/failed': GaugeMetricFamily(
+               'druid_realtime_ingest_handoff_failed_count',
+               'Number of times handoff failed.',
+               labels=['datasource']),
+            'ingest/handoff/count': GaugeMetricFamily(
+               'druid_realtime_ingest_handoff_count',
+               'Number of times handoff has happened.',
+               labels=['datasource']),
+        }
 
     def _get_query_histograms(self, daemon):
         return {
@@ -307,8 +358,8 @@ class DruidCollector(object):
 
     @scrape_duration.time()
     def collect(self):
-        # Metrics common to Broker and Historical
-        for daemon in ['broker', 'historical']:
+        # Metrics common to Broker, Historical and Peon
+        for daemon in ['broker', 'historical', 'peon']:
             query_metrics = self._get_query_histograms(daemon)
             cache_metrics = self._get_cache_counters(daemon)
 
@@ -324,6 +375,10 @@ class DruidCollector(object):
                             sum_value=self.histograms[metric][daemon][datasource]['sum'])
                     yield query_metrics[metric]
 
+        # Metrics common to Broker and Historical
+        for daemon in ['broker', 'historical']:
+            cache_metrics = self._get_cache_counters(daemon)
+
             for metric in cache_metrics:
                 if not self.counters[metric] or daemon not in self.counters[metric]:
                     if not self.supported_metric_names[metric]:
@@ -336,8 +391,10 @@ class DruidCollector(object):
 
         historical_health_metrics = self._get_historical_counters()
         coordinator_metrics = self._get_coordinator_counters()
+        realtime_metrics = self._get_realtime_counters()
         for daemon, metrics in [('coordinator', coordinator_metrics),
-                                ('historical', historical_health_metrics)]:
+                                ('historical', historical_health_metrics),
+                                ('peon', realtime_metrics)]:
             for metric in metrics:
                 if not self.counters[metric] or daemon not in self.counters[metric]:
                     if not self.supported_metric_names[metric]:
@@ -374,14 +431,6 @@ class DruidCollector(object):
                       "because the 'feed' field is not 'metrics' or "
                       "the metric itself is not supported: {}"
                       .format(datapoint))
-            return
-
-        # Transform the metric name into a metrics' key
-        daemon_name = DruidCollector.sanitize_field(str(datapoint['service']))
-
-        if daemon_name not in self.allowed_daemons:
-            log.error('Received metric from a daemon that is not allowed ({}), '
-                      'dropping it.'.format(daemon_name))
             return
 
         metric_name = str(datapoint['metric'])
