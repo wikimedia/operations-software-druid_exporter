@@ -1,3 +1,10 @@
+prometheus-druid-exporter (0.5-1) unstable; urgency=low
+
+  * Add support for realtime ingestion metrics
+  * Removed unused --allow-daemons parameter.
+
+ -- Luca Toscano <ltoscano@wikimedia.org>  Wed, 06 Dec 2017 10:53:36 +0000
+
 prometheus-druid-exporter (0.4-1) unstable; urgency=low
 
   * Remove unused query/node/* metrics support.
