@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='druid_exporter',
-      version='0.5',
+      version='0.6',
       description='Prometheus exporter for Druid',
       url='https://github.com/wikimedia/operations-software-druid_exporter',
       author='Luca Toscano',

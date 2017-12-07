@@ -34,44 +34,62 @@ class DruidCollector(object):
         # List of supported metrics and their fields of the JSON dictionary
         # sent by a Druid daemon. These fields will be added as labels
         # when returning the available metrics in @collect.
+        # Due to the fact that metric names are not unique (like segment/count),
+        # it is necessary to split the data structure by daemon.
         self.supported_metric_names = {
-            # Broker, Historical
-            'query/time': ['dataSource'],
-            'query/bytes': ['dataSource'],
-            'query/cache/total/numEntries': None,
-            'query/cache/total/sizeBytes': None,
-            'query/cache/total/hits': None,
-            'query/cache/total/misses': None,
-            'query/cache/total/evictions': None,
-            'query/cache/total/timeouts': None,
-            'query/cache/total/errors': None,
-            # Historical + Coordinator
-            'segment/count': ['dataSource'],
-            # Historical
-            'segment/max': None,
-            'segment/used': ['tier', 'dataSource'],
-            'segment/scan/pending': None,
-            # Coordinator
-            'segment/assigned/count': ['tier'],
-            'segment/moved/count': ['tier'],
-            'segment/dropped/count': ['tier'],
-            'segment/deleted/count': ['tier'],
-            'segment/unneeded/count': ['tier'],
-            'segment/overShadowed/count': None,
-            'segment/loadQueue/failed': ['server'],
-            'segment/loadQueue/count': ['server'],
-            'segment/dropQueue/count': ['server'],
-            'segment/size': ['dataSource'],
-            'segment/unavailable/count': ['dataSource'],
-            'segment/underReplicated/count': ['tier', 'dataSource'],
-            'ingest/events/thrownAway': ['dataSource'],
-            'ingest/events/unparseable': ['dataSource'],
-            'ingest/events/processed': ['dataSource'],
-            'ingest/rows/output': ['dataSource'],
-            'ingest/persists/count': ['dataSource'],
-            'ingest/persists/failed': ['dataSource'],
-            'ingest/handoff/failed': ['dataSource'],
-            'ingest/handoff/count': ['dataSource'],
+            'broker': {
+                'query/time': ['dataSource'],
+                'query/bytes': ['dataSource'],
+                'query/cache/total/numEntries': None,
+                'query/cache/total/sizeBytes': None,
+                'query/cache/total/hits': None,
+                'query/cache/total/misses': None,
+                'query/cache/total/evictions': None,
+                'query/cache/total/timeouts': None,
+                'query/cache/total/errors': None,
+            },
+            'historical': {
+                'query/time': ['dataSource'],
+                'query/bytes': ['dataSource'],
+                'query/cache/total/numEntries': None,
+                'query/cache/total/sizeBytes': None,
+                'query/cache/total/hits': None,
+                'query/cache/total/misses': None,
+                'query/cache/total/evictions': None,
+                'query/cache/total/timeouts': None,
+                'query/cache/total/errors': None,
+                'segment/count': ['tier', 'dataSource'],
+                'segment/max': None,
+                'segment/used': ['tier', 'dataSource'],
+                'segment/scan/pending': None,
+            },
+            'coordinator': {
+                'segment/count': ['dataSource'],
+                'segment/assigned/count': ['tier'],
+                'segment/moved/count': ['tier'],
+                'segment/dropped/count': ['tier'],
+                'segment/deleted/count': ['tier'],
+                'segment/unneeded/count': ['tier'],
+                'segment/overShadowed/count': None,
+                'segment/loadQueue/failed': ['server'],
+                'segment/loadQueue/count': ['server'],
+                'segment/dropQueue/count': ['server'],
+                'segment/size': ['dataSource'],
+                'segment/unavailable/count': ['dataSource'],
+                'segment/underReplicated/count': ['tier', 'dataSource'],
+            },
+            'peon': {
+                'query/time': ['dataSource'],
+                'query/bytes': ['dataSource'],
+                'ingest/events/thrownAway': ['dataSource'],
+                'ingest/events/unparseable': ['dataSource'],
+                'ingest/events/processed': ['dataSource'],
+                'ingest/rows/output': ['dataSource'],
+                'ingest/persists/count': ['dataSource'],
+                'ingest/persists/failed': ['dataSource'],
+                'ingest/handoff/failed': ['dataSource'],
+                'ingest/handoff/count': ['dataSource'],
+            },
         }
 
         # Buckets used when storing histogram metrics.
@@ -190,7 +208,7 @@ class DruidCollector(object):
                'druid_' + daemon + '_query_cache_numentries_count',
                'Number of cache entries.'),
             'query/cache/total/sizeBytes': GaugeMetricFamily(
-               'druid_' + daemon + '_query_cache_sizebytes_count',
+               'druid_' + daemon + '_query_cache_size_bytes',
                'Size in bytes of cache entries.'),
             'query/cache/total/hits': GaugeMetricFamily(
                'druid_' + daemon + '_query_cache_hits_count',
@@ -217,11 +235,11 @@ class DruidCollector(object):
             'segment/count': GaugeMetricFamily(
                'druid_historical_segment_count',
                'Number of served segments.',
-               labels=['datasource']),
+               labels=['tier', 'datasource']),
             'segment/used': GaugeMetricFamily(
                'druid_historical_segment_used_bytes',
                'Bytes used for served segments.',
-               labels=['datasource']),
+               labels=['tier', 'datasource']),
             'segment/scan/pending': GaugeMetricFamily(
                'druid_historical_segment_scan_pending',
                'Number of segments in queue waiting to be scanned.'),
@@ -299,17 +317,17 @@ class DruidCollector(object):
             The algorithm is generic enough to support all metrics handled by
             self.counters without caring about the number of labels needed.
         """
-        daemon_name = DruidCollector.sanitize_field(str(datapoint['service']))
+        daemon = DruidCollector.sanitize_field(str(datapoint['service']))
         metric_name = str(datapoint['metric'])
         metric_value = float(datapoint['value'])
 
         metrics_storage = self.counters[metric_name]
-        metric_labels = self.supported_metric_names[metric_name]
+        metric_labels = self.supported_metric_names[daemon][metric_name]
 
-        metrics_storage.setdefault(daemon_name, {})
+        metrics_storage.setdefault(daemon, {})
 
         if metric_labels:
-            metrics_storage_cursor = metrics_storage[daemon_name]
+            metrics_storage_cursor = metrics_storage[daemon]
             for label in metric_labels:
                 label_value = str(datapoint[label])
                 if metric_labels[-1] != label:
@@ -318,7 +336,7 @@ class DruidCollector(object):
                 else:
                     metrics_storage_cursor[label_value] = metric_value
         else:
-            metrics_storage[daemon_name] = metric_value
+            metrics_storage[daemon] = metric_value
 
         log.debug("The datapoint {} modified the counters dictionary to: \n{}"
                   .format(datapoint, self.counters))
@@ -336,17 +354,17 @@ class DruidCollector(object):
             self.counters = {'query/time': {'broker':
                 {'test': {'10': 1, '100': 1, etc.., 'sum': 10}}}}}
         """
-        daemon_name = DruidCollector.sanitize_field(str(datapoint['service']))
+        daemon = DruidCollector.sanitize_field(str(datapoint['service']))
         metric_name = str(datapoint['metric'])
         metric_value = float(datapoint['value'])
         datasource = str(datapoint['dataSource'])
 
-        self.histograms.setdefault(metric_name, {daemon_name: {datasource: {}}})
-        self.histograms[metric_name].setdefault(daemon_name, {datasource: {}})
-        self.histograms[metric_name][daemon_name].setdefault(datasource, {})
+        self.histograms.setdefault(metric_name, {daemon: {datasource: {}}})
+        self.histograms[metric_name].setdefault(daemon, {datasource: {}})
+        self.histograms[metric_name][daemon].setdefault(datasource, {})
 
         for bucket in self.metric_buckets[metric_name]:
-            stored_buckets = self.histograms[metric_name][daemon_name][datasource]
+            stored_buckets = self.histograms[metric_name][daemon][datasource]
             if bucket not in stored_buckets:
                 stored_buckets[bucket] = 0
             if bucket != 'sum' and metric_value <= float(bucket):
@@ -381,7 +399,7 @@ class DruidCollector(object):
 
             for metric in cache_metrics:
                 if not self.counters[metric] or daemon not in self.counters[metric]:
-                    if not self.supported_metric_names[metric]:
+                    if not self.supported_metric_names[daemon][metric]:
                         cache_metrics[metric].add_metric([], float('nan'))
                     else:
                         continue
@@ -397,12 +415,12 @@ class DruidCollector(object):
                                 ('peon', realtime_metrics)]:
             for metric in metrics:
                 if not self.counters[metric] or daemon not in self.counters[metric]:
-                    if not self.supported_metric_names[metric]:
+                    if not self.supported_metric_names[daemon][metric]:
                         metrics[metric].add_metric([], float('nan'))
                     else:
                         continue
                 else:
-                    labels = self.supported_metric_names[metric]
+                    labels = self.supported_metric_names[daemon][metric]
                     if not labels:
                         metrics[metric].add_metric(
                             [], self.counters[metric][daemon])
@@ -425,8 +443,16 @@ class DruidCollector(object):
         yield registered
 
     def register_datapoint(self, datapoint):
+        if (datapoint['feed'] != 'metrics'):
+            log.debug("The following feed does not contain a datapoint, "
+                      "dropping it: {}"
+                      .format(datapoint))
+            return
+
+        daemon = DruidCollector.sanitize_field(str(datapoint['service']))
         if (datapoint['feed'] != 'metrics' or
-                datapoint['metric'] not in self.supported_metric_names):
+                daemon not in self.supported_metric_names or
+                datapoint['metric'] not in self.supported_metric_names[daemon]):
             log.debug("The following datapoint is not supported, either "
                       "because the 'feed' field is not 'metrics' or "
                       "the metric itself is not supported: {}"
