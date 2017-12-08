@@ -19,9 +19,9 @@ import json
 import logging
 import sys
 
+from druid_exporter import collector
 from prometheus_client import generate_latest, make_wsgi_app, REGISTRY
 from wsgiref.simple_server import make_server
-from . import collector
 
 log = logging.getLogger(__name__)
 

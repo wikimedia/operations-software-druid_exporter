@@ -23,19 +23,212 @@ class TestDruidCollector(unittest.TestCase):
 
     def setUp(self):
         self.collector = DruidCollector()
+
+        # List of metric names as emitted by Druid, coupled with their
+        # Prometheus metric name and labels.
+        self.supported_metric_names = {
+            'broker': {
+                'query/time': {
+                    'metric_name': 'druid_broker_query_time_ms',
+                    'labels': ['dataSource']
+                },
+                'query/bytes': {
+                    'metric_name': 'druid_broker_query_bytes',
+                    'labels': ['dataSource']
+                },
+                'query/cache/total/numEntries': {
+                    'metric_name': 'druid_broker_query_cache_numentries_count',
+                    'labels': None
+                },
+                'query/cache/total/sizeBytes': {
+                    'metric_name': 'druid_broker_query_cache_size_bytes',
+                    'labels': None
+                },
+                'query/cache/total/hits': {
+                    'metric_name': 'druid_broker_query_cache_hits_count',
+                    'labels': None
+                },
+                'query/cache/total/misses': {
+                    'metric_name':'druid_broker_query_cache_hits_count',
+                    'labels': None
+                },
+                'query/cache/total/evictions': {
+                    'metric_name':'druid_broker_query_cache_evictions_count',
+                    'labels': None
+                },
+                'query/cache/total/timeouts': {
+                    'metric_name':'druid_broker_query_cache_timeouts_count',
+                    'labels': None
+                },
+                'query/cache/total/errors': {
+                    'metric_name':'druid_broker_query_cache_errors_count',
+                    'labels': None
+                }
+            },
+            'historical': {
+                'query/time': {
+                    'metric_name': 'druid_historical_query_time_ms',
+                    'labels': ['dataSource']
+                },
+                'query/bytes': {
+                    'metric_name': 'druid_historical_query_bytes',
+                    'labels': ['dataSource']
+                },
+                'query/cache/total/numEntries': {
+                    'metric_name': 'druid_historical_query_cache_numentries_count',
+                    'labels': None
+                },
+                'query/cache/total/sizeBytes': {
+                    'metric_name': 'druid_historical_query_cache_size_bytes',
+                    'labels': None
+                },
+                'query/cache/total/hits': {
+                    'metric_name': 'druid_historical_query_cache_hits_count',
+                    'labels': None
+                },
+                'query/cache/total/misses': {
+                    'metric_name':'druid_historical_query_cache_hits_count',
+                    'labels': None
+                },
+                'query/cache/total/evictions': {
+                    'metric_name':'druid_historical_query_cache_evictions_count',
+                    'labels': None
+                },
+                'query/cache/total/timeouts': {
+                    'metric_name':'druid_historical_query_cache_timeouts_count',
+                    'labels': None
+                },
+                'query/cache/total/errors': {
+                    'metric_name':'druid_historical_query_cache_errors_count',
+                    'labels': None
+                },
+                'segment/count': {
+                    'metric_name': 'druid_historical_segment_count',
+                    'labels': ['tier', 'dataSource']
+                },
+                'segment/max': {
+                    'metric_name': 'druid_historical_max_segment_bytes',
+                    'labels': None
+                },
+                'segment/used': {
+                    'metric_name': 'druid_historical_segment_used_bytes',
+                    'labels': ['tier', 'dataSource']
+                },
+                'segment/scan/pending': {
+                    'metric_name': 'druid_historical_segment_scan_pending',
+                    'labels': None
+                }
+            },
+            'coordinator': {
+                'segment/assigned/count': {
+                    'metric_name': 'druid_coordinator_segment_assigned_count',
+                    'labels': ['tier'],
+                },
+                'segment/moved/count': {
+                    'metric_name': 'druid_coordinator_segment_moved_count',
+                    'labels': ['tier']
+                },
+                'segment/dropped/count': {
+                    'metric_name': 'druid_coordinator_segment_dropped_count',
+                    'labels': ['tier']
+                },
+                'segment/deleted/count': {
+                    'metric_name': 'druid_coordinator_segment_deleted_count',
+                    'labels': ['tier']
+                },
+                'segment/unneeded/count': {
+                    'metric_name': 'druid_coordinator_segment_unneeded_count',
+                    'labels': ['tier']
+                },
+                'segment/overShadowed/count': {
+                    'metric_name': 'druid_coordinator_segment_overshadowed_count',
+                    'labels': None
+                },
+                'segment/loadQueue/failed': {
+                    'metric_name': 'druid_coordinator_segment_loadqueue_failed_count',
+                    'labels': ['server']
+                },
+                'segment/loadQueue/count': {
+                    'metric_name': 'druid_coordinator_segment_loadqueue_count',
+                    'labels': ['server']
+                },
+                'segment/dropQueue/count': {
+                    'metric_name': 'druid_coordinator_segment_dropqueue_count',
+                    'labels': ['server']
+                },
+                'segment/size': {
+                    'metric_name': 'druid_coordinator_segment_size_bytes',
+                    'labels': ['dataSource']
+                },
+                'segment/count': {
+                    'metric_name': 'druid_coordinator_segment_count',
+                    'labels': ['dataSource']
+                },
+                'segment/unavailable/count': {
+                    'metric_name': 'druid_coordinator_segment_unavailable_count',
+                    'labels': ['dataSource']
+                },
+                'segment/underReplicated/count': {
+                    'metric_name': 'druid_coordinator_segment_under_replicated_count',
+                    'labels': ['tier', 'dataSource']
+                }
+            },
+            'peon': {
+                'query/time': {
+                    'metric_name': 'druid_peon_query_time_ms',
+                    'labels': ['dataSource']
+                },
+                'query/bytes': {
+                    'metric_name': 'druid_peon_query_bytes',
+                    'labels': ['dataSource']
+                },
+                'ingest/events/thrownAway': {
+                    'metric_name': 'druid_realtime_ingest_events_thrown_away_count',
+                    'labels': ['dataSource'],
+                },
+                'ingest/events/unparseable': {
+                    'metric_name': 'druid_realtime_ingest_events_unparseable_count',
+                    'labels': ['dataSource'],
+                },
+                'ingest/events/processed': {
+                    'metric_name': 'druid_realtime_ingest_events_processed_count',
+                    'labels': ['dataSource'],
+                },
+                'ingest/rows/output': {
+                    'metric_name': 'druid_realtime_ingest_rows_output_count',
+                    'labels': ['dataSource'],
+                },
+                'ingest/persists/count': {
+                    'metric_name': 'druid_realtime_ingest_persists_count',
+                    'labels': ['dataSource'],
+                },
+                'ingest/persists/failed': {
+                    'metric_name': 'druid_realtime_ingest_persists_failed_count',
+                    'labels': ['dataSource'],
+                },
+                'ingest/handoff/failed': {
+                    'metric_name': 'druid_realtime_ingest_handoff_failed_count',
+                    'labels': ['dataSource'],
+                },
+                'ingest/handoff/count': {
+                    'metric_name': 'druid_realtime_ingest_handoff_count',
+                    'labels': ['dataSource'],
+                }
+            }
+        }
         self.metrics_without_labels = [
             'druid_historical_segment_scan_pending',
             'druid_historical_max_segment_bytes',
             'druid_coordinator_segment_overshadowed_count',
             'druid_broker_query_cache_numentries_count',
-            'druid_broker_query_cache_sizebytes_count',
+            'druid_broker_query_cache_size_bytes',
             'druid_broker_query_cache_hits_count',
             'druid_broker_query_cache_misses_count',
             'druid_broker_query_cache_evictions_count',
             'druid_broker_query_cache_timeouts_count',
             'druid_broker_query_cache_errors_count',
             'druid_historical_query_cache_numentries_count',
-            'druid_historical_query_cache_sizebytes_count',
+            'druid_historical_query_cache_size_bytes',
             'druid_historical_query_cache_hits_count',
             'druid_historical_query_cache_misses_count',
             'druid_historical_query_cache_evictions_count',
@@ -122,16 +315,16 @@ class TestDruidCollector(unittest.TestCase):
         # Third datapoint for the same metric as used in the first test, should
         # add a key to the already existent dictionary.
         datapoint = {'feed': 'metrics', 'service': 'druid/historical', 'dataSource': 'test2',
-                     'metric': 'segment/used', 'tier': '_default_tier', 'value': 543}
+                     'metric': 'segment/count', 'tier': '_default_tier', 'value': 543}
         self.collector.register_datapoint(datapoint)
-        expected_result['segment/used']['historical']['_default_tier']['test2'] = 543.0
+        expected_result['segment/count'] = {'historical': {'_default_tier': {'test2': 543.0}}}
         self.assertEqual(self.collector.counters, expected_result)
 
-        # Fourth datapoint for an already seen metric but differen broker
-        datapoint = {'feed': 'metrics', 'service': 'druid/broker', 'dataSource': 'test',
-                     'metric': 'segment/used', 'tier': '_default_tier', 'value': 111}
+        # Fourth datapoint for an already seen metric but different daemon
+        datapoint = {'feed': 'metrics', 'service': 'druid/coordinator', 'dataSource': 'test',
+                     'metric': 'segment/count', 'value': 111}
         self.collector.register_datapoint(datapoint)
-        expected_result['segment/used']['broker'] = {'_default_tier': {'test': 111.0}}
+        expected_result['segment/count']['coordinator'] = {'test': 111.0}
         self.assertEqual(self.collector.counters, expected_result)
 
         # Fifth datapoint should override a pre-existent value
@@ -303,6 +496,12 @@ class TestDruidCollector(unittest.TestCase):
              "service": "druid/coordinator", "host": "druid1001.eqiad.wmnet: 8081",
              "metric": "segment/count", "value": 56, "dataSource": "netflow"},
 
+            {"feed": "metrics", "timestamp": "2017-12-07T09:55:04.937Z",
+             "service": "druid/historical", "host": "druid1001.eqiad.wmnet:8083",
+             "metric": "segment/used", "value": 3252671142,
+             "dataSource": "banner_activity_minutely",
+             "priority": "0", "tier": "_default_tier"},
+
             {"feed": "metrics", "timestamp": "2017-11-14T13:08:20.820Z",
              "service": "druid/historical", "host": "druid1001.eqiad.wmnet:8083",
              "metric": "segment/max", "value": 2748779069440},
@@ -440,19 +639,82 @@ class TestDruidCollector(unittest.TestCase):
         for datapoint in datapoints:
             self.collector.register_datapoint(datapoint)
 
+        # Running it twice should not produce more metrics
+        for datapoint in datapoints:
+            self.collector.register_datapoint(datapoint)
+
         collected_metrics = 0
+        prometheus_metric_samples = []
         for metric in self.collector.collect():
             # Metrics should not be returned if no sample is associated
             # (not even a 'nan')
             self.assertNotEqual(metric.samples, [])
             if metric.samples and metric.samples[0][0].startswith('druid_'):
                 collected_metrics += 1
+                prometheus_metric_samples.append(metric.samples)
 
         # Number of metrics pushed using register_datapoint plus the ones
         # generated by the exporter for bookeeping,
         # like druid_exporter_datapoints_registered_count
         expected_druid_metrics_len = len(datapoints) + 1
         self.assertEqual(collected_metrics, expected_druid_metrics_len)
+
+        for datapoint in datapoints:
+            metric = datapoint['metric']
+            daemon = datapoint['service'].split('/')[1]
+            prometheus_metric_name = self.supported_metric_names[daemon][metric]['metric_name']
+            prometheus_metric_labels = self.supported_metric_names[daemon][metric]['labels']
+
+            # The prometheus metric samples are in two forms:
+            # 1) histograms:
+            # [('druid_broker_query_time_ms_bucket', {'datasource': 'NavigationTiming', 'le': '10'}, 2),
+            #  [...]
+            #  ('druid_broker_query_time_ms_bucket', {'datasource': 'NavigationTiming', 'le': 'inf'}, 2),
+            #  ('druid_broker_query_time_ms_count', {'datasource': 'NavigationTiming'}, 2),
+            #  ('druid_broker_query_time_ms_sum', {'datasource': 'NavigationTiming'}, 20.0)]
+            #
+            # 2) counter/gauge
+            #    [('druid_coordinator_segment_unneeded_count', {'tier': '_default_tier'}, 0.0)]
+            #
+            # The idea of the following test is to make sure that after sending
+            # one data point for each metric, the sample contains the information
+            # needed.
+            #
+            if 'query' not in metric:
+                for sample in prometheus_metric_samples:
+                    if prometheus_metric_name == sample[0][0]:
+                        if prometheus_metric_labels:
+                            for label in prometheus_metric_labels:
+                                self.assertTrue(label.lower() in sample[0][1])
+                        else:
+                            self.assertTrue(sample[0][1] == {})
+                        break
+            else:
+                for sample in [s for s in prometheus_metric_samples if len(s) == 8]:
+                    if metric in sample[0][0]:
+                        bucket_counter = 0
+                        sum_counter = 0
+                        count_counter = 0
+                        for s in sample:
+                            if s[0] == metric + "_sum":
+                                sum_counter += 1
+                            elif s[0] == metric + "_count":
+                                count_counter += 1
+                            elif s[0] == metric + "_bucket":
+                                bucket_counter += 1
+                            else:
+                                raise RuntimeError(
+                                    'Histogram sample not supported: {}'
+                                    .format(s))
+                        assertEqual(sum_counter, 1)
+                        assertEqual(count_counter, 1)
+                        assertEqual(bucket_counter, 6)
+                        break
+                else:
+                    RuntimeError(
+                        'The metric {} does not have a valid sample!'
+                        .format(metric))
+
 
     def test_register_datapoints_count(self):
         datapoints = [
