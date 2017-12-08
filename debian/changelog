@@ -1,3 +1,19 @@
+prometheus-druid-exporter (0.6-1) unstable; urgency=low
+
+  * Allow a metric to be emitted by multiple daemons,
+    even with different metrics. The use case of 'segment/count'
+    is unique since the metric is emitted by both coordinator and
+    historical, with different labels.
+  * Correct the historical's metric labels for segment/count
+    and segment/used.
+  * Change name of druid_(broker|historical)_query_cache_sizebytes_count
+    to a more appropriate _query_cache_size_bytes
+  * No-op variable name changes to be more consistent in the code.
+  * Prefer absolute import for the collector.py module
+  * Add a more precise and robust set of tests.
+
+ -- Luca Toscano <ltoscano@wikimedia.org>  Fri, 08 Dec 2017 10:53:36 +0000
+
 prometheus-druid-exporter (0.5-1) unstable; urgency=low
 
   * Add support for realtime ingestion metrics
