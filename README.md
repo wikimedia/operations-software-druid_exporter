@@ -7,9 +7,11 @@ following the [Prometheus](https://prometheus.io) standards.
 
 The easiest way to run `druid_exporter` is via a virtualenv:
 
+```
   virtualenv .venv
-  .venv/bin/python setup.py
+  .venv/bin/python setup.py install
   .venv/bin/druid_exporter
+```
 
 By default metrics are exposed on TCP port `8000`. Python 2 is not supported.
 
