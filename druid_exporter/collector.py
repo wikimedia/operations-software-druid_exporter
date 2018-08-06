@@ -444,19 +444,15 @@ class DruidCollector(object):
 
     def register_datapoint(self, datapoint):
         if (datapoint['feed'] != 'metrics'):
-            log.debug("The following feed does not contain a datapoint, "
-                      "dropping it: {}"
-                      .format(datapoint))
+            log.debug("'feed' field is not 'metrics' in datapoint, skipping: {}".format(datapoint))
             return
 
         daemon = DruidCollector.sanitize_field(str(datapoint['service']))
-        if (datapoint['feed'] != 'metrics' or
-                daemon not in self.supported_metric_names or
-                datapoint['metric'] not in self.supported_metric_names[daemon]):
-            log.debug("The following datapoint is not supported, either "
-                      "because the 'feed' field is not 'metrics' or "
-                      "the metric itself is not supported: {}"
-                      .format(datapoint))
+        if (daemon not in self.supported_metric_names):
+            log.debug("Daemon '{}' is not supported, skipping: {}".format(daemon, datapoint))
+            return
+        if (datapoint['metric'] not in self.supported_metric_names[daemon]):
+            log.debug("Metric '{}' is not supported, skipping: {}".format(datapoint['metric'], datapoint))
             return
 
         metric_name = str(datapoint['metric'])
