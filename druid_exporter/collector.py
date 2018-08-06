@@ -78,7 +78,7 @@ class DruidCollector(object):
                 'segment/unavailable/count': ['dataSource'],
                 'segment/underReplicated/count': ['tier', 'dataSource'],
             },
-            'peon': {
+            'realtime': {
                 'query/time': ['dataSource'],
                 'query/bytes': ['dataSource'],
                 'ingest/events/thrownAway': ['dataSource'],
@@ -376,8 +376,8 @@ class DruidCollector(object):
 
     @scrape_duration.time()
     def collect(self):
-        # Metrics common to Broker, Historical and Peon
-        for daemon in ['broker', 'historical', 'peon']:
+        # Metrics common to Broker, Historical and Realtime
+        for daemon in ['broker', 'historical', 'realtime']:
             query_metrics = self._get_query_histograms(daemon)
             cache_metrics = self._get_cache_counters(daemon)
 
@@ -412,7 +412,7 @@ class DruidCollector(object):
         realtime_metrics = self._get_realtime_counters()
         for daemon, metrics in [('coordinator', coordinator_metrics),
                                 ('historical', historical_health_metrics),
-                                ('peon', realtime_metrics)]:
+                                ('realtime', realtime_metrics)]:
             for metric in metrics:
                 if not self.counters[metric] or daemon not in self.counters[metric]:
                     if not self.supported_metric_names[daemon][metric]:
