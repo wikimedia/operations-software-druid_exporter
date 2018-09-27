@@ -17,7 +17,7 @@ By default metrics are exposed on TCP port `8000`. Python 2 is not supported.
 
 ## Druid versions supported
 
-This exporter is tested and used by the Wikimedia foundation with Druid version 0.9.2,
+This exporter is tested and used by the Wikimedia foundation with Druid version 0.11.0,
 so it might not work as expected for newer versions.
 
 ## How does it work?
@@ -25,7 +25,7 @@ so it might not work as expected for newer versions.
 Druid can be configured to emit metrics (JSON data) to a HTTP endpoint configured
 via the following runtime properties:
 
-http://druid.io/docs/0.9.2/configuration/index.html#http-emitter-module
+http://druid.io/docs/0.11.0/configuration/index.html#http-emitter-module
 
 The druid prometheus exporter accepts HTTP POST data, inspects it and stores/aggregates
 every supported datapoint into a data structure. It then formats the
@@ -82,10 +82,25 @@ This exporter is supposed to be run on each host running a Druid daemon.
 
 Realtime metrics have been tested only when emitted by Peons, since the Wikimedia
 use case (for the moment) is to use [Tranquillity](https://github.com/druid-io/tranquility)
-rather than Real Time nodes.
+rather than Real Time nodes or the [Kafka Indexing Service](http://druid.io/docs/0.11.0/development/extensions-core/kafka-ingestion.html).
 
 Please check the following document for more info:
-http://druid.io/docs/0.9.2/operations/metrics.html
+http://druid.io/docs/0.11.0/operations/metrics.html
 
 The JVM metrics are currently not supported, please check other projects
 like https://github.com/prometheus/jmx_exporter if you need to collect them.
+
+## Known limitations
+
+When a Druid cluster is running with multiple coordinators or overlords,
+only one of them acts as leader and the others are in standby mode. From the metrics
+emission point of view, this means that only the daemon acting as leader emits druid metrics,
+the others don't (except for metrics like Jetty ones). This has caused some confusion
+in our day to day operations, since when a coordinator or a overlord leader looses
+its status in favor of another one (for example due to a restart) it stops emitting
+metrics, and the Prometheus exporter keeps reporting the last known state. This might
+be confusing to see at first (expecially if metrics are aggregated) so the current
+"fix" is to restart the Druid Prometheus exporter when a coordinator or a overlord
+leader are restarted. Future versions of this project might contain a fix, pull
+requests are welcome!
+
