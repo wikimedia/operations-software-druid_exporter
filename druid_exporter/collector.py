@@ -90,6 +90,19 @@ class DruidCollector(object):
                 'ingest/handoff/failed': ['dataSource'],
                 'ingest/handoff/count': ['dataSource'],
             },
+            'middlemanager': {
+                'query/time': ['dataSource'],
+                'query/bytes': ['dataSource'],
+                'ingest/events/messageGap': ['dataSource'],
+                'ingest/events/thrownAway': ['dataSource'],
+                'ingest/events/unparseable': ['dataSource'],
+                'ingest/events/processed': ['dataSource'],
+                'ingest/rows/output': ['dataSource'],
+                'ingest/persists/count': ['dataSource'],
+                'ingest/persists/failed': ['dataSource'],
+                'ingest/handoff/failed': ['dataSource'],
+                'ingest/handoff/count': ['dataSource'],
+            },
         }
 
         # Buckets used when storing histogram metrics.
@@ -139,6 +152,7 @@ class DruidCollector(object):
             'segment/size',
             'segment/unavailable/count',
             'segment/underReplicated/count',
+            'ingest/events/messageGap',
             'ingest/events/thrownAway',
             'ingest/events/unparseable',
             'ingest/events/processed',
@@ -187,6 +201,10 @@ class DruidCollector(object):
             'ingest/handoff/count': GaugeMetricFamily(
                'druid_realtime_ingest_handoff_count',
                'Number of times handoff has happened.',
+               labels=['datasource']),
+            'ingest/events/messageGap': GaugeMetricFamily(
+               'druid_realtime_ingest_events_messageGap',
+               'Time gap between the data time in event and current system time.',
                labels=['datasource']),
         }
 
@@ -377,7 +395,7 @@ class DruidCollector(object):
     @scrape_duration.time()
     def collect(self):
         # Metrics common to Broker, Historical and Peon
-        for daemon in ['broker', 'historical', 'peon']:
+        for daemon in ['broker', 'historical', 'middlemanager']:
             query_metrics = self._get_query_histograms(daemon)
             cache_metrics = self._get_cache_counters(daemon)
 
@@ -412,7 +430,7 @@ class DruidCollector(object):
         realtime_metrics = self._get_realtime_counters()
         for daemon, metrics in [('coordinator', coordinator_metrics),
                                 ('historical', historical_health_metrics),
-                                ('peon', realtime_metrics)]:
+                                ('middlemanager', realtime_metrics)]:
             for metric in metrics:
                 if not self.counters[metric] or daemon not in self.counters[metric]:
                     if not self.supported_metric_names[daemon][metric]:
