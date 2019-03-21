@@ -89,6 +89,7 @@ class DruidCollector(object):
                 'ingest/persists/failed': ['dataSource'],
                 'ingest/handoff/failed': ['dataSource'],
                 'ingest/handoff/count': ['dataSource'],
+                'jetty/numOpenConnections': ['dataSource'],
             },
             'middlemanager': {
                 'query/time': ['dataSource'],
@@ -102,6 +103,7 @@ class DruidCollector(object):
                 'ingest/persists/failed': ['dataSource'],
                 'ingest/handoff/failed': ['dataSource'],
                 'ingest/handoff/count': ['dataSource'],
+                'jetty/numOpenConnections': ['dataSource'],
             },
         }
 
