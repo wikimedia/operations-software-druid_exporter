@@ -208,6 +208,10 @@ class DruidCollector(object):
                'druid_realtime_ingest_events_messageGap',
                'Time gap between the data time in event and current system time.',
                labels=['datasource']),
+            'jetty/numOpenConnections': GaugeMetricFamily(
+               'druid_middleman_jetty_numOpenConnections',
+               'Number of open jetty connections.',
+               labels=['datasource']),
         }
 
     def _get_query_histograms(self, daemon):
