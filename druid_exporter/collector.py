@@ -163,6 +163,7 @@ class DruidCollector(object):
             'ingest/persists/failed',
             'ingest/handoff/failed',
             'ingest/handoff/count',
+            'jetty/numOpenConnections',
         ])
 
     @staticmethod
@@ -209,7 +210,7 @@ class DruidCollector(object):
                'Time gap between the data time in event and current system time.',
                labels=['datasource']),
             'jetty/numOpenConnections': GaugeMetricFamily(
-               'druid_middleman_jetty_numOpenConnections',
+               'druid_middlemanager_jetty_numOpenConnections',
                'Number of open jetty connections.',
                labels=['datasource']),
         }
