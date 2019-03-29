@@ -14,6 +14,7 @@
 # limitations under the License.
 
 import unittest
+import logging
 
 from collections import defaultdict
 from druid_exporter.collector import DruidCollector
@@ -171,7 +172,11 @@ class TestDruidCollector(unittest.TestCase):
                 'segment/underReplicated/count': {
                     'metric_name': 'druid_coordinator_segment_under_replicated_count',
                     'labels': ['tier', 'dataSource']
-                }
+                },
+                'jetty/numOpenConnections': {
+                    'metric_name': 'druid_coordinator_jetty_numOpenConnections',
+                    'labels': None
+                },                
             },
             'peon': {
                 'query/time': {
@@ -214,12 +219,59 @@ class TestDruidCollector(unittest.TestCase):
                     'metric_name': 'druid_realtime_ingest_handoff_count',
                     'labels': ['dataSource'],
                 }
-            }
+            },
+            'middlemanager': {
+                'query/time': {
+                    'metric_name': 'druid_peon_query_time_ms',
+                    'labels': ['dataSource']
+                },
+                'query/bytes': {
+                    'metric_name': 'druid_peon_query_bytes',
+                    'labels': ['dataSource']
+                },
+                'ingest/events/thrownAway': {
+                    'metric_name': 'druid_realtime_ingest_events_thrown_away_count',
+                    'labels': ['dataSource'],
+                },
+                'ingest/events/unparseable': {
+                    'metric_name': 'druid_realtime_ingest_events_unparseable_count',
+                    'labels': ['dataSource'],
+                },
+                'ingest/events/processed': {
+                    'metric_name': 'druid_realtime_ingest_events_processed_count',
+                    'labels': ['dataSource'],
+                },
+                'ingest/rows/output': {
+                    'metric_name': 'druid_realtime_ingest_rows_output_count',
+                    'labels': ['dataSource'],
+                },
+                'ingest/persists/count': {
+                    'metric_name': 'druid_realtime_ingest_persists_count',
+                    'labels': ['dataSource'],
+                },
+                'ingest/persists/failed': {
+                    'metric_name': 'druid_realtime_ingest_persists_failed_count',
+                    'labels': ['dataSource'],
+                },
+                'ingest/handoff/failed': {
+                    'metric_name': 'druid_realtime_ingest_handoff_failed_count',
+                    'labels': ['dataSource'],
+                },
+                'ingest/handoff/count': {
+                    'metric_name': 'druid_realtime_ingest_handoff_count',
+                    'labels': ['dataSource'],
+                },
+                'jetty/numOpenConnections': {
+                    'metric_name': 'druid_middlemanager_jetty_numOpenConnections',
+                    'labels': ['dataSource'],
+                },                
+            }            
         }
         self.metrics_without_labels = [
             'druid_historical_segment_scan_pending',
             'druid_historical_max_segment_bytes',
             'druid_coordinator_segment_overshadowed_count',
+            'druid_coordinator_jetty_numOpenConnections',            
             'druid_broker_query_cache_numentries_count',
             'druid_broker_query_cache_size_bytes',
             'druid_broker_query_cache_hits_count',
@@ -234,7 +286,7 @@ class TestDruidCollector(unittest.TestCase):
             'druid_historical_query_cache_evictions_count',
             'druid_historical_query_cache_timeouts_count',
             'druid_historical_query_cache_errors_count',
-            'druid_exporter_datapoints_registered_count',
+            'druid_exporter_datapoints_registered_count_total',
         ]
 
     def test_store_histogram(self):
@@ -340,16 +392,18 @@ class TestDruidCollector(unittest.TestCase):
            have any label associated with it, 'nan' will be returned, otherwise
            the metric will not be rendered.
         """
+        print("------test_metrics_without_datapoints-------")
         druid_metric_names = []
         for metric in self.collector.collect():
             if not metric.samples[0][0].startswith("druid_") or \
                     "scrape" in metric.samples[0][0]:
                 continue
             self.assertEqual(len(metric.samples), 1)
+            print(metric.samples[0][0])
             druid_metric_names.append(metric.samples[0][0])
 
         self.assertEqual(set(druid_metric_names), set(self.metrics_without_labels))
-
+        print("----------")
     def test_add_one_datapoint_for_each_metric(self):
         """Add one datapoint for each metric and make sure that they render correctly
            when running collect()
@@ -632,12 +686,22 @@ class TestDruidCollector(unittest.TestCase):
              "host": "druid1001.eqiad.wmnet:8101", "metric": "ingest/handoff/count", "value": 0,
              "dataSource": "banner_activity_minutely",
              "taskId": ["index_realtime_banner_activity_minutely_2017-12-06T11:00:00.000Z_2_0"]},
+             
+            {"feed":"metrics","timestamp":"2019-03-29T20:31:26.826Z","service":"druid/coordinator",
+            "host":"ip-10-0-5-184.ec2.internal:9082","version":"0.12.3",
+            "metric":"jetty/numOpenConnections","value":4},
+            
+            {"feed":"metrics","timestamp":"2019-03-29T21:23:08.981Z","service":"druid/middlemanager",
+            "host":"ip-10-0-2-76.ec2.internal:20003","version":"0.12.3",
+            "metric":"jetty/numOpenConnections","value":14,"dataSource":["campaignsummary"],
+            "id":["index_kafka_campaignsummary_a699d42600a3fff_bakggdka"]}      
         ]
 
         # The following datapoint registration batch should not generate
         # any exception (breaking the test).
         for datapoint in datapoints:
             self.collector.register_datapoint(datapoint)
+            print(datapoint)	
 
         # Running it twice should not produce more metrics
         for datapoint in datapoints:
@@ -650,6 +714,7 @@ class TestDruidCollector(unittest.TestCase):
             # (not even a 'nan')
             self.assertNotEqual(metric.samples, [])
             if metric.samples and metric.samples[0][0].startswith('druid_'):
+                print(metric.samples[0][0])
                 collected_metrics += 1
                 prometheus_metric_samples.append(metric.samples)
 
@@ -657,6 +722,8 @@ class TestDruidCollector(unittest.TestCase):
         # generated by the exporter for bookeeping,
         # like druid_exporter_datapoints_registered_count
         expected_druid_metrics_len = len(datapoints) + 1
+        print("Collected metrics are ")
+        print(collected_metrics)
         self.assertEqual(collected_metrics, expected_druid_metrics_len)
 
         for datapoint in datapoints:

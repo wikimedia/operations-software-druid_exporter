@@ -15,6 +15,10 @@ The easiest way to run `druid_exporter` is via a virtualenv:
 
 By default metrics are exposed on TCP port `8000`. Python 2 is not supported.
 
+To execute the tests
+```
+python3 -m unittest discover -s test
+```
 ## Druid versions supported
 
 This exporter is tested and used by the Wikimedia foundation with Druid version 0.11.0,

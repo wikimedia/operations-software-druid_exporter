@@ -62,7 +62,6 @@ class DruidCollector(object):
                 'segment/max': None,
                 'segment/used': ['tier', 'dataSource'],
                 'segment/scan/pending': None,
-                'jetty/numOpenConnections': None,
             },
             'coordinator': {
                 'segment/count': ['dataSource'],
@@ -78,10 +77,12 @@ class DruidCollector(object):
                 'segment/size': ['dataSource'],
                 'segment/unavailable/count': ['dataSource'],
                 'segment/underReplicated/count': ['tier', 'dataSource'],
+                'jetty/numOpenConnections': None,                
             },
             'peon': {
                 'query/time': ['dataSource'],
                 'query/bytes': ['dataSource'],
+                'ingest/events/messageGap': ['dataSource'],                
                 'ingest/events/thrownAway': ['dataSource'],
                 'ingest/events/unparseable': ['dataSource'],
                 'ingest/events/processed': ['dataSource'],
@@ -269,10 +270,6 @@ class DruidCollector(object):
             'segment/scan/pending': GaugeMetricFamily(
                'druid_historical_segment_scan_pending',
                'Number of segments in queue waiting to be scanned.'),
-            'jetty/numOpenConnections': GaugeMetricFamily(
-               'druid_historical_jetty_numOpenConnections',
-               'Number of open jetty connections.',
-               labels=['datasource']),
             }
 
     def _get_coordinator_counters(self):
@@ -332,6 +329,10 @@ class DruidCollector(object):
                'segments that should be loaded in the cluster are '
                'available for queries.',
                labels=['tier', 'datasource']),
+            'jetty/numOpenConnections': GaugeMetricFamily(
+               'druid_coordinator_jetty_numOpenConnections',
+               'Number of open jetty connections.',
+               labels=['datasource']),
             }
 
     def store_counter(self, datapoint):
@@ -407,7 +408,7 @@ class DruidCollector(object):
     @scrape_duration.time()
     def collect(self):
         # Metrics common to Broker, Historical and Peon
-        for daemon in ['broker', 'historical', 'middlemanager']:
+        for daemon in ['broker', 'historical', 'middlemanager', 'peon']:
             query_metrics = self._get_query_histograms(daemon)
             cache_metrics = self._get_cache_counters(daemon)
 
@@ -442,6 +443,7 @@ class DruidCollector(object):
         realtime_metrics = self._get_realtime_counters()
         for daemon, metrics in [('coordinator', coordinator_metrics),
                                 ('historical', historical_health_metrics),
+                                ('peon', realtime_metrics),
                                 ('middlemanager', realtime_metrics)]:
             for metric in metrics:
                 if not self.counters[metric] or daemon not in self.counters[metric]:
