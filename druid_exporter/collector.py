@@ -62,6 +62,7 @@ class DruidCollector(object):
                 'segment/max': None,
                 'segment/used': ['tier', 'dataSource'],
                 'segment/scan/pending': None,
+                'jetty/numOpenConnections': None,                  
             },
             'coordinator': {
                 'segment/count': ['dataSource'],
@@ -270,6 +271,10 @@ class DruidCollector(object):
             'segment/scan/pending': GaugeMetricFamily(
                'druid_historical_segment_scan_pending',
                'Number of segments in queue waiting to be scanned.'),
+            'jetty/numOpenConnections': GaugeMetricFamily(
+               'druid_historical_jetty_numOpenConnections',
+               'Number of open jetty connections.',
+               labels=['datasource']),               
             }
 
     def _get_coordinator_counters(self):
