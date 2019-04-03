@@ -267,7 +267,7 @@ class TestDruidCollector(unittest.TestCase):
                 },
                 'jetty/numOpenConnections': {
                     'metric_name': 'druid_middlemanager_jetty_numOpenConnections',
-                    'labels': ['dataSource'],
+                    'labels': None,
                 },                
             }            
         }
@@ -291,7 +291,8 @@ class TestDruidCollector(unittest.TestCase):
             'druid_historical_query_cache_timeouts_count',
             'druid_historical_query_cache_errors_count',
             'druid_exporter_datapoints_registered_count_total',
-            'druid_historical_jetty_numOpenConnections',            
+            'druid_historical_jetty_numOpenConnections',
+            'druid_middlemanager_jetty_numOpenConnections',                        
         ]
 
     def test_store_histogram(self):

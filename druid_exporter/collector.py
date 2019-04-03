@@ -106,7 +106,7 @@ class DruidCollector(object):
                 'ingest/persists/failed': ['dataSource'],
                 'ingest/handoff/failed': ['dataSource'],
                 'ingest/handoff/count': ['dataSource'],
-                'jetty/numOpenConnections': ['dataSource'],
+                'jetty/numOpenConnections': None,
             },
         }
 
