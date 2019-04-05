@@ -47,6 +47,9 @@ class DruidCollector(object):
                 'query/cache/total/evictions': None,
                 'query/cache/total/timeouts': None,
                 'query/cache/total/errors': None,
+                'query/success/count': None,
+                'query/failed/count': None,
+                'query/interrupted/count': None,
             },
             'historical': {
                 'query/time': ['dataSource'],
@@ -62,7 +65,10 @@ class DruidCollector(object):
                 'segment/max': None,
                 'segment/used': ['tier', 'dataSource'],
                 'segment/scan/pending': None,
-                'jetty/numOpenConnections': None,                  
+                'jetty/numOpenConnections': None,
+                'query/success/count': None,
+                'query/failed/count': None,
+                'query/interrupted/count': None,                
             },
             'coordinator': {
                 'segment/count': ['dataSource'],
@@ -92,7 +98,7 @@ class DruidCollector(object):
                 'ingest/persists/failed': ['dataSource'],
                 'ingest/handoff/failed': ['dataSource'],
                 'ingest/handoff/count': ['dataSource'],
-                'jetty/numOpenConnections': ['dataSource'],
+                'jetty/numOpenConnections': ['dataSource'],            
             },
             'middlemanager': {
                 'query/time': ['dataSource'],
@@ -106,7 +112,7 @@ class DruidCollector(object):
                 'ingest/persists/failed': ['dataSource'],
                 'ingest/handoff/failed': ['dataSource'],
                 'ingest/handoff/count': ['dataSource'],
-                'jetty/numOpenConnections': None,
+                'jetty/numOpenConnections': None,               
             },
         }
 
@@ -167,6 +173,9 @@ class DruidCollector(object):
             'ingest/handoff/failed',
             'ingest/handoff/count',
             'jetty/numOpenConnections',
+            'query/success/count',
+            'query/failed/count',
+            'query/interrupted/count',
         ])
 
     @staticmethod
@@ -253,6 +262,15 @@ class DruidCollector(object):
             'query/cache/total/errors': GaugeMetricFamily(
                'druid_' + daemon + '_query_cache_errors_count',
                'Number of cache errors.'),
+            'query/failed/count': GaugeMetricFamily(
+               'druid_' + daemon + '_query_failed_count',
+               'Number of cache errors.'),
+            'query/success/count': GaugeMetricFamily(
+               'druid_' + daemon + '_query_success_count',
+               'Number of cache errors.'),
+            'query/interrupted/count': GaugeMetricFamily(
+               'druid_' + daemon + '_query_interrupted_count',
+               'Number of cache errors.'),                                             
             }
 
     def _get_historical_counters(self):

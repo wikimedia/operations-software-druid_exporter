@@ -64,7 +64,19 @@ class TestDruidCollector(unittest.TestCase):
                 'query/cache/total/errors': {
                     'metric_name':'druid_broker_query_cache_errors_count',
                     'labels': None
-                }
+                },
+                'query/success/count': {
+                    'metric_name':'druid_broker_query_success_count',
+                    'labels': None
+                },
+                'query/failed/count': {
+                    'metric_name':'druid_broker_query_failed_count',
+                    'labels': None
+                },
+                'query/interrupted/count': {
+                    'metric_name':'druid_broker_query_interrupted_count',
+                    'labels': None
+                }                                               
             },
             'historical': {
                 'query/time': {
@@ -122,7 +134,19 @@ class TestDruidCollector(unittest.TestCase):
                 'jetty/numOpenConnections': {
                     'metric_name': 'druid_historical_jetty_numOpenConnections',
                     'labels': None
-                },                                
+                },
+                'query/success/count': {
+                    'metric_name':'druid_historical_query_success_count',
+                    'labels': None
+                },
+                'query/failed/count': {
+                    'metric_name':'druid_historical_query_failed_count',
+                    'labels': None
+                },
+                'query/interrupted/count': {
+                    'metric_name':'druid_historical_query_interrupted_count',
+                    'labels': None
+                }                                           
             },
             'coordinator': {
                 'segment/assigned/count': {
@@ -292,7 +316,13 @@ class TestDruidCollector(unittest.TestCase):
             'druid_historical_query_cache_errors_count',
             'druid_exporter_datapoints_registered_count_total',
             'druid_historical_jetty_numOpenConnections',
-            'druid_middlemanager_jetty_numOpenConnections',                        
+            'druid_middlemanager_jetty_numOpenConnections',
+            'druid_broker_query_success_count',
+            'druid_broker_query_failed_count',
+            'druid_broker_query_interrupted_count',  
+            'druid_historical_query_success_count',
+            'druid_historical_query_failed_count',
+            'druid_historical_query_interrupted_count',                                
         ]
 
     def test_store_histogram(self):
@@ -701,7 +731,31 @@ class TestDruidCollector(unittest.TestCase):
             
             {"feed":"metrics","timestamp":"2019-03-29T20:31:26.826Z","service":"druid/historical",
             "host":"ip-10-0-5-124.ec2.internal:9082","version":"0.12.3",
-            "metric":"jetty/numOpenConnections","value":12},            
+            "metric":"jetty/numOpenConnections","value":12},
+
+            {"feed":"metrics","timestamp":"2019-04-05T18:27:49.812Z","service":"druid/broker",
+            "host":"ip-10-0-5-240.ec2.internal:9080","version":"0.12.3",
+            "metric":"query/failed/count","value":0},
+
+            {"feed":"metrics","timestamp":"2019-04-05T18:18:49.811Z","service":"druid/broker",
+            "host":"ip-10-0-5-240.ec2.internal:9080","version":"0.12.3",
+            "metric":"query/success/count","value":60},
+            
+            {"feed":"metrics","timestamp":"2019-04-05T18:27:49.812Z","service":"druid/broker",
+            "host":"ip-10-0-5-240.ec2.internal:9080","version":"0.12.3",
+            "metric":"query/interrupted/count","value":0},  
+            
+            {"feed":"metrics","timestamp":"2019-04-05T18:27:49.812Z","service":"druid/historical",
+            "host":"ip-10-0-5-240.ec2.internal:9080","version":"0.12.3",
+            "metric":"query/failed/count","value":0},
+
+            {"feed":"metrics","timestamp":"2019-04-05T18:18:49.811Z","service":"druid/historical",
+            "host":"ip-10-0-5-240.ec2.internal:9080","version":"0.12.3",
+            "metric":"query/success/count","value":60},
+            
+            {"feed":"metrics","timestamp":"2019-04-05T18:27:49.812Z","service":"druid/historical",
+            "host":"ip-10-0-5-240.ec2.internal:9080","version":"0.12.3",
+            "metric":"query/interrupted/count","value":0},                                                      
         ]
 
         # The following datapoint registration batch should not generate
