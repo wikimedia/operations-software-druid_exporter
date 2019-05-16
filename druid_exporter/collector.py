@@ -100,10 +100,15 @@ QUERY_CACHE_METRICS = {
     'query/cache/total/timeouts': {},
 }
 
+QUERY_COUNT_METRIC = {
+    'type': 'counter',
+    'suffix': '',
+}
+
 QUERY_COUNT_STATS = {
-    'query/failed/count': {},
-    'query/interrupted/count': {},
-    'query/success/count': {},
+    'query/failed/count': {**QUERY_COUNT_METRIC},
+    'query/interrupted/count': {**QUERY_COUNT_METRIC},
+    'query/success/count': {**QUERY_COUNT_METRIC},
 }
 
 SEGMENT_METRICS = {
