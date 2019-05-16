@@ -70,7 +70,7 @@ JETTY_METRICS = {
 QUERY_METRICS = {
     'query/bytes': {'labels': ['type', 'dataSource'], 'type': 'summary'},
     'query/cpu/time': {**QUERY_TIME_SUMMARY_METRIC},
-    'query/time': {'labels': ['type', 'dataSource'], 'suffix': '_ms', 'type': 'histogram', 'buckets': (150, 500, 1000, 5000, 10000, float('inf'))},
+    'query/time': {'labels': ['type', 'dataSource'], 'suffix': '_ms', 'type': 'histogram', 'buckets': (150, 1000, 5000, 10000, 30000, float('inf'))},
 }
 
 QUERY_CACHE_METRICS = {
