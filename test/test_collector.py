@@ -247,7 +247,7 @@ class TestDruidCollector(unittest.TestCase):
         expected_struct = {
             'query/time': {
                 'historical':
-                    {'test': {'10': 0, '100': 1, '500': 1, '1000': 1, '10000': 1, 'inf': 1, 'sum': 42.0}}}}
+                    {'test': {'10': 0, '100': 1, '500': 1, '1000': 1, '2000': 1, '3000': 1, '5000': 1, '7000': 1, '10000': 1, 'inf': 1, 'sum': 42.0}}}}
         expected_result = defaultdict(lambda: {}, expected_struct)
         self.assertEqual(self.collector.histograms, expected_result)
 
@@ -265,6 +265,7 @@ class TestDruidCollector(unittest.TestCase):
                      'metric': 'query/time', 'value': 5}
         self.collector.register_datapoint(datapoint)
         expected_result['query/time']['historical']['test2'] = {'10': 1, '100': 1, '500': 1, '1000': 1,
+                                                                '2000': 1, '3000': 1, '5000': 1, '7000': 1,
                                                                 '10000': 1, 'inf': 1, 'sum': 5.0}
         self.assertEqual(self.collector.histograms, expected_result)
 
@@ -272,7 +273,7 @@ class TestDruidCollector(unittest.TestCase):
                      'metric': 'query/time', 'value': 42}
         self.collector.register_datapoint(datapoint)
         expected_result['query/time']['broker'] = {
-            'test': {'10': 0, '100': 1, '500': 1, '1000': 1,  '10000': 1, 'inf': 1, 'sum': 42.0}}
+            'test': {'10': 0, '100': 1, '500': 1, '1000': 1, '2000': 1, '3000': 1, '5000': 1, '7000': 1, '10000': 1, 'inf': 1, 'sum': 42.0}}
         self.assertEqual(self.collector.histograms, expected_result)
 
         datapoint = {'feed': 'metrics', 'service': 'druid/broker', 'dataSource': 'test',
@@ -289,6 +290,7 @@ class TestDruidCollector(unittest.TestCase):
                      'metric': 'query/time', 'value': 5}
         self.collector.register_datapoint(datapoint)
         expected_result['query/time']['broker']['test2'] = {'10': 1, '100': 1, '500': 1, '1000': 1,
+                                                            '2000': 1, '3000': 1, '5000': 1, '7000': 1,
                                                             '10000': 1, 'inf': 1, 'sum': 5.0}
         self.assertEqual(self.collector.histograms, expected_result)
 

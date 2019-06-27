@@ -96,8 +96,8 @@ class DruidCollector(object):
         # 'sum' is a special bucket that will be used to collect the sum
         # of all values ending up in the various buckets.
         self.metric_buckets = {
-            'query/time': ['10', '100', '500', '1000', '10000', 'inf', 'sum'],
-            'query/bytes': ['10', '100', '500', '1000', '10000', 'inf', 'sum'],
+            'query/time': ['10', '100', '500', '1000', '2000', '3000', '5000', '7000', '10000', 'inf', 'sum'],
+            'query/bytes': ['10', '100', '500', '1000', '2000', '3000', '5000', '7000', '10000', 'inf', 'sum'],
         }
 
         # Data structure holding histogram data
