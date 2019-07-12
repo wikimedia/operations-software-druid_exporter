@@ -47,6 +47,10 @@ class DruidCollector(object):
                 'query/cache/total/evictions': None,
                 'query/cache/total/timeouts': None,
                 'query/cache/total/errors': None,
+                'query/count': None,
+                'query/success/count': None,
+                'query/failed/count': None,
+                'query/interrupted/count': None,
             },
             'historical': {
                 'query/time': ['dataSource'],
@@ -123,6 +127,11 @@ class DruidCollector(object):
             'query/cache/total/evictions',
             'query/cache/total/timeouts',
             'query/cache/total/errors',
+            "query/count",
+            'query/count',
+            'query/success/count',
+            'query/failed/count',
+            'query/interrupted/count',
             'segment/max',
             'segment/count',
             'segment/used',
@@ -225,6 +234,21 @@ class DruidCollector(object):
             'query/cache/total/errors': GaugeMetricFamily(
                'druid_' + daemon + '_query_cache_errors_count',
                'Number of cache errors.'),
+            }
+    def _get_query_counters(self, daemon):
+        return {
+            'query/count': GaugeMetricFamily(
+               'druid_' + daemon + '_query_count',
+               'Number of queries'),
+            'query/success/count': GaugeMetricFamily(
+               'druid_' + daemon + '_success_query_count',
+               'Number of Successfull queries'),
+            'query/failed/count': GaugeMetricFamily(
+               'druid_' + daemon + '_failed_query_count',
+               'Number of failed queries'),
+            'query/interrupted/count': GaugeMetricFamily(
+               'druid_' + daemon + '_interrupted_query_count',
+               'Number of interrupted queries'),
             }
 
     def _get_historical_counters(self):
@@ -406,6 +430,18 @@ class DruidCollector(object):
                 else:
                     cache_metrics[metric].add_metric([], self.counters[metric][daemon])
                 yield cache_metrics[metric]
+        # Metrics in broker related to query counters
+        for daemon in ['broker']:
+            query_metrics = self._get_query_counters(daemon)
+            for metric in query_metrics:
+                if not self.counters[metric] or daemon not in self.counters[metric]:
+                    if not self.supported_metric_names[daemon][metric]:
+                        query_metrics[metric].add_metric([], float('nan'))
+                    else:
+                        continue
+                else:
+                    query_metrics[metric].add_metric([], self.counters[metric][daemon])
+                yield query_metrics[metric]
 
         historical_health_metrics = self._get_historical_counters()
         coordinator_metrics = self._get_coordinator_counters()
