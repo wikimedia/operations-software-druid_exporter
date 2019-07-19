@@ -178,7 +178,7 @@ MINUTE = 60000
 
 INDEXING_SERVICE_METRICS = {
     'task/run/time': {'labels': ['dataSource', 'taskType', 'taskStatus'], 'suffix': '_ms', 'type': 'histogram', 'buckets': (30 * MINUTE, 60 * MINUTE, 90 * MINUTE, 120 * MINUTE, float('inf'))},
-    'segment/added/bytes': {'labels': ['dataSource', 'taskType']},
+    'segment/added/bytes': {'labels': ['dataSource', 'taskType'], 'type': 'counter'},
 }
 
 class DruidCollector(object):
