@@ -261,13 +261,13 @@ class DruidCollector(object):
         daemon = str(datapoint['service']).replace('druid/', '').lower()
 
         if (daemon not in self.supported_metrics):
-            log.warn("daemon '{}' is not supported, skipping: {}".format(daemon, datapoint))
+            log.debug("daemon '{}' is not supported, skipping: {}".format(daemon, datapoint))
             return
 
         metric_name = str(datapoint['metric'])
 
         if (metric_name not in self.supported_metrics[daemon]):
-            log.warn("metric '{}' is not supported, skipping: {}".format(datapoint['metric'], datapoint))
+            log.debug("metric '{}' is not supported, skipping: {}".format(datapoint['metric'], datapoint))
             return
 
         config = self.supported_metrics[daemon][metric_name]
