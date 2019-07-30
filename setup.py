@@ -9,7 +9,7 @@ setup(name='druid_exporter',
       license='Apache License, Version 2.0',
       packages=['druid_exporter'],
       install_requires=[
-          'prometheus-client==0.5.0',
+          'prometheus-client==0.7.1',
       ],
       entry_points={
           'console_scripts': [
