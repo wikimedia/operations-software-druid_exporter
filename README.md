@@ -45,14 +45,14 @@ This exporter is supposed to be run on each host running a Druid daemon.
 * `query/cache/total/evictions`
 * `query/cache/total/timeouts`
 * `query/cache/total/errors`
-* `query/count` (only available with Druid 0.14+ - needs QueryCountStatsMonitor)
-* `query/success/count` (needs QueryCountStatsMonitor)
-* `query/failed/count` (needs QueryCountStatsMonitor)
-* `query/interrupted/count` (needs QueryCountStatsMonitor)
 
 ### Historical, Coordinator (counters)
 * `segment/max` [datasource]
 * `segment/count` [datasource]
+* `query/count` (only available with Druid 0.14+ - needs QueryCountStatsMonitor)
+* `query/success/count` (needs QueryCountStatsMonitor)
+* `query/failed/count` (needs QueryCountStatsMonitor)
+* `query/interrupted/count` (needs QueryCountStatsMonitor)
 
 ### Historical (counters)
 * `segment/used` [datasource]
