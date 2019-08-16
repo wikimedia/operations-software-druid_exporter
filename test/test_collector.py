@@ -63,7 +63,23 @@ class TestDruidCollector(unittest.TestCase):
                 'query/cache/total/errors': {
                     'metric_name':'druid_broker_query_cache_errors_count',
                     'labels': None
-                }
+                },
+                'query/count': {
+                    'metric_name': 'druid_broker_query_count',
+                    'labels': None,
+                },
+                'query/success/count': {
+                    'metric_name': 'druid_broker_query_success_count',
+                    'labels': None,
+                },
+                'query/failed/count': {
+                    'metric_name': 'druid_broker_query_failed_count',
+                    'labels': None,
+                },
+                'query/interrupted/count': {
+                    'metric_name': 'druid_broker_query_interrupted_count',
+                    'labels': None,
+                },
             },
             'historical': {
                 'query/time': {
@@ -117,7 +133,23 @@ class TestDruidCollector(unittest.TestCase):
                 'segment/scan/pending': {
                     'metric_name': 'druid_historical_segment_scan_pending',
                     'labels': None
-                }
+                },
+                'query/count': {
+                    'metric_name': 'druid_historical_query_count',
+                    'labels': None,
+                },
+                'query/success/count': {
+                    'metric_name': 'druid_historical_query_success_count',
+                    'labels': None,
+                },
+                'query/failed/count': {
+                    'metric_name': 'druid_historical_query_failed_count',
+                    'labels': None,
+                },
+                'query/interrupted/count': {
+                    'metric_name': 'druid_historical_query_interrupted_count',
+                    'labels': None,
+                },
             },
             'coordinator': {
                 'segment/assigned/count': {
@@ -227,6 +259,10 @@ class TestDruidCollector(unittest.TestCase):
             'druid_broker_query_cache_evictions_count',
             'druid_broker_query_cache_timeouts_count',
             'druid_broker_query_cache_errors_count',
+            'druid_broker_success_query_count',
+            'druid_broker_interrupted_query_count',
+            'druid_broker_failed_query_count',
+            'druid_broker_query_count',
             'druid_historical_query_cache_numentries_count',
             'druid_historical_query_cache_size_bytes',
             'druid_historical_query_cache_hits_count',
@@ -234,7 +270,11 @@ class TestDruidCollector(unittest.TestCase):
             'druid_historical_query_cache_evictions_count',
             'druid_historical_query_cache_timeouts_count',
             'druid_historical_query_cache_errors_count',
-            'druid_exporter_datapoints_registered_count',
+            'druid_historical_success_query_count',
+            'druid_historical_interrupted_query_count',
+            'druid_historical_failed_query_count',
+            'druid_historical_query_count',
+            'druid_exporter_datapoints_registered_total',
         ]
 
     def test_store_histogram(self):
@@ -634,6 +674,30 @@ class TestDruidCollector(unittest.TestCase):
              "host": "druid1001.eqiad.wmnet:8101", "metric": "ingest/handoff/count", "value": 0,
              "dataSource": "banner_activity_minutely",
              "taskId": ["index_realtime_banner_activity_minutely_2017-12-06T11:00:00.000Z_2_0"]},
+
+            {"feed":"metrics", "timestamp":"2019-08-16T13:27:50.945Z", "service":"druid/broker",
+             "host":"druid1001.eqiad.wmnet:8082", "metric":"query/count", "value":223},
+
+            {"feed":"metrics", "timestamp":"2019-08-16T13:27:50.945Z", "service":"druid/broker",
+             "host":"druid1001.eqiad.wmnet:8082", "metric":"query/success/count", "value":223},
+
+            {"feed":"metrics", "timestamp":"2019-08-16T13:27:50.945Z", "service":"druid/broker",
+             "host":"druid1001.eqiad.wmnet:8082", "metric":"query/interrupted/count", "value":0},
+
+            {"feed":"metrics", "timestamp":"2019-08-16T13:27:50.946Z", "service":"druid/broker",
+             "host":"druid1001.eqiad.wmnet:8082", "metric":"query/failed/count", "value":0},
+
+            {"feed":"metrics", "timestamp":"2019-08-16T13:27:50.945Z", "service":"druid/historical",
+             "host":"druid1001.eqiad.wmnet:8082", "metric":"query/count", "value":223},
+
+            {"feed":"metrics", "timestamp":"2019-08-16T13:27:50.945Z", "service":"druid/historical",
+             "host":"druid1001.eqiad.wmnet:8082", "metric":"query/success/count", "value":223},
+
+            {"feed":"metrics", "timestamp":"2019-08-16T13:27:50.945Z", "service":"druid/historical",
+             "host":"druid1001.eqiad.wmnet:8082", "metric":"query/interrupted/count", "value":0},
+
+            {"feed":"metrics", "timestamp":"2019-08-16T13:27:50.946Z", "service":"druid/historical",
+             "host":"druid1001.eqiad.wmnet:8082", "metric":"query/failed/count", "value":0}
         ]
 
         # The following datapoint registration batch should not generate
@@ -657,7 +721,7 @@ class TestDruidCollector(unittest.TestCase):
 
         # Number of metrics pushed using register_datapoint plus the ones
         # generated by the exporter for bookeeping,
-        # like druid_exporter_datapoints_registered_count
+        # like druid_exporter_datapoints_registered_total
         expected_druid_metrics_len = len(datapoints) + 1
         self.assertEqual(collected_metrics, expected_druid_metrics_len)
 
