@@ -47,6 +47,7 @@ class DruidCollector(object):
                 'query/cache/total/evictions': None,
                 'query/cache/total/timeouts': None,
                 'query/cache/total/errors': None,
+                'query/count': None,
                 'query/success/count': None,
                 'query/failed/count': None,
                 'query/interrupted/count': None,
@@ -61,14 +62,15 @@ class DruidCollector(object):
                 'query/cache/total/evictions': None,
                 'query/cache/total/timeouts': None,
                 'query/cache/total/errors': None,
+                'query/count': None,
+                'query/success/count': None,
+                'query/failed/count': None,
+                'query/interrupted/count': None,
                 'segment/count': ['tier', 'dataSource'],
                 'segment/max': None,
                 'segment/used': ['tier', 'dataSource'],
                 'segment/scan/pending': None,
-                'jetty/numOpenConnections': None,
-                'query/success/count': None,
-                'query/failed/count': None,
-                'query/interrupted/count': None,                
+                'jetty/numOpenConnections': None
             },
             'coordinator': {
                 'segment/count': ['dataSource'],
@@ -120,8 +122,8 @@ class DruidCollector(object):
         # 'sum' is a special bucket that will be used to collect the sum
         # of all values ending up in the various buckets.
         self.metric_buckets = {
-            'query/time': ['10', '100', '500', '1000', '10000', 'inf', 'sum'],
-            'query/bytes': ['10', '100', '500', '1000', '10000', 'inf', 'sum'],
+            'query/time': ['10', '100', '500', '1000', '2000', '3000', '5000', '7000', '10000', 'inf', 'sum'],
+            'query/bytes': ['10', '100', '500', '1000', '2000', '3000', '5000', '7000', '10000', 'inf', 'sum'],
         }
 
         # Data structure holding histogram data
@@ -147,6 +149,10 @@ class DruidCollector(object):
             'query/cache/total/evictions',
             'query/cache/total/timeouts',
             'query/cache/total/errors',
+            'query/count',
+            'query/success/count',
+            'query/failed/count',
+            'query/interrupted/count',
             'segment/max',
             'segment/count',
             'segment/used',
@@ -173,9 +179,6 @@ class DruidCollector(object):
             'ingest/handoff/failed',
             'ingest/handoff/count',
             'jetty/numOpenConnections',
-            'query/success/count',
-            'query/failed/count',
-            'query/interrupted/count',
         ])
 
     @staticmethod
@@ -262,15 +265,21 @@ class DruidCollector(object):
             'query/cache/total/errors': GaugeMetricFamily(
                'druid_' + daemon + '_query_cache_errors_count',
                'Number of cache errors.'),
-            'query/failed/count': GaugeMetricFamily(
-               'druid_' + daemon + '_query_failed_count',
-               'Number of cache errors.'),
+            }
+    def _get_query_counters(self, daemon):
+        return {
+            'query/count': GaugeMetricFamily(
+               'druid_' + daemon + '_query_count',
+               'Number of queries'),
             'query/success/count': GaugeMetricFamily(
-               'druid_' + daemon + '_query_success_count',
-               'Number of cache errors.'),
+               'druid_' + daemon + '_success_query_count',
+               'Number of Successfull queries'),
+            'query/failed/count': GaugeMetricFamily(
+               'druid_' + daemon + '_failed_query_count',
+               'Number of failed queries'),
             'query/interrupted/count': GaugeMetricFamily(
-               'druid_' + daemon + '_query_interrupted_count',
-               'Number of cache errors.'),                                             
+               'druid_' + daemon + '_interrupted_query_count',
+               'Number of interrupted queries'),
             }
 
     def _get_historical_counters(self):
@@ -447,7 +456,7 @@ class DruidCollector(object):
                             sum_value=self.histograms[metric][daemon][datasource]['sum'])
                     yield query_metrics[metric]
 
-        # Metrics common to Broker and Historical
+        # Cache metrics common to Broker and Historical
         for daemon in ['broker', 'historical']:
             cache_metrics = self._get_cache_counters(daemon)
 
@@ -460,6 +469,19 @@ class DruidCollector(object):
                 else:
                     cache_metrics[metric].add_metric([], self.counters[metric][daemon])
                 yield cache_metrics[metric]
+
+        # Query count metrics common to broker and historical
+        for daemon in ['broker', 'historical']:
+            query_metrics = self._get_query_counters(daemon)
+            for metric in query_metrics:
+                if not self.counters[metric] or daemon not in self.counters[metric]:
+                    if not self.supported_metric_names[daemon][metric]:
+                        query_metrics[metric].add_metric([], float('nan'))
+                    else:
+                        continue
+                else:
+                    query_metrics[metric].add_metric([], self.counters[metric][daemon])
+                yield query_metrics[metric]
 
         historical_health_metrics = self._get_historical_counters()
         coordinator_metrics = self._get_coordinator_counters()
@@ -491,7 +513,7 @@ class DruidCollector(object):
                                     self.counters[metric][daemon][outer_label][inner_label])
                 yield metrics[metric]
 
-        registered = CounterMetricFamily('druid_exporter_datapoints_registered_count',
+        registered = CounterMetricFamily('druid_exporter_datapoints_registered',
                                          'Number of datapoints successfully registered '
                                          'by the exporter.')
         registered.add_metric([], self.datapoints_registered)

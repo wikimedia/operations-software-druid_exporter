@@ -65,18 +65,22 @@ class TestDruidCollector(unittest.TestCase):
                     'metric_name':'druid_broker_query_cache_errors_count',
                     'labels': None
                 },
+                'query/count': {
+                    'metric_name': 'druid_broker_query_count',
+                    'labels': None,
+                },
                 'query/success/count': {
-                    'metric_name':'druid_broker_query_success_count',
-                    'labels': None
+                    'metric_name': 'druid_broker_query_success_count',
+                    'labels': None,
                 },
                 'query/failed/count': {
-                    'metric_name':'druid_broker_query_failed_count',
-                    'labels': None
+                    'metric_name': 'druid_broker_query_failed_count',
+                    'labels': None,
                 },
                 'query/interrupted/count': {
-                    'metric_name':'druid_broker_query_interrupted_count',
-                    'labels': None
-                }                                               
+                    'metric_name': 'druid_broker_query_interrupted_count',
+                    'labels': None,
+                },
             },
             'historical': {
                 'query/time': {
@@ -135,18 +139,22 @@ class TestDruidCollector(unittest.TestCase):
                     'metric_name': 'druid_historical_jetty_numOpenConnections',
                     'labels': None
                 },
+                'query/count': {
+                    'metric_name': 'druid_historical_query_count',
+                    'labels': None,
+                },
                 'query/success/count': {
-                    'metric_name':'druid_historical_query_success_count',
-                    'labels': None
+                    'metric_name': 'druid_historical_query_success_count',
+                    'labels': None,
                 },
                 'query/failed/count': {
-                    'metric_name':'druid_historical_query_failed_count',
-                    'labels': None
+                    'metric_name': 'druid_historical_query_failed_count',
+                    'labels': None,
                 },
                 'query/interrupted/count': {
-                    'metric_name':'druid_historical_query_interrupted_count',
-                    'labels': None
-                }                                           
+                    'metric_name': 'druid_historical_query_interrupted_count',
+                    'labels': None,
+                },
             },
             'coordinator': {
                 'segment/assigned/count': {
@@ -307,6 +315,10 @@ class TestDruidCollector(unittest.TestCase):
             'druid_broker_query_cache_evictions_count',
             'druid_broker_query_cache_timeouts_count',
             'druid_broker_query_cache_errors_count',
+            'druid_broker_success_query_count',
+            'druid_broker_interrupted_query_count',
+            'druid_broker_failed_query_count',
+            'druid_broker_query_count',
             'druid_historical_query_cache_numentries_count',
             'druid_historical_query_cache_size_bytes',
             'druid_historical_query_cache_hits_count',
@@ -314,15 +326,13 @@ class TestDruidCollector(unittest.TestCase):
             'druid_historical_query_cache_evictions_count',
             'druid_historical_query_cache_timeouts_count',
             'druid_historical_query_cache_errors_count',
-            'druid_exporter_datapoints_registered_count_total',
             'druid_historical_jetty_numOpenConnections',
             'druid_middlemanager_jetty_numOpenConnections',
-            'druid_broker_query_success_count',
-            'druid_broker_query_failed_count',
-            'druid_broker_query_interrupted_count',  
-            'druid_historical_query_success_count',
-            'druid_historical_query_failed_count',
-            'druid_historical_query_interrupted_count',                                
+            'druid_historical_success_query_count',
+            'druid_historical_interrupted_query_count',
+            'druid_historical_failed_query_count',
+            'druid_historical_query_count',
+            'druid_exporter_datapoints_registered_total',
         ]
 
     def test_store_histogram(self):
@@ -335,7 +345,7 @@ class TestDruidCollector(unittest.TestCase):
         expected_struct = {
             'query/time': {
                 'historical':
-                    {'test': {'10': 0, '100': 1, '500': 1, '1000': 1, '10000': 1, 'inf': 1, 'sum': 42.0}}}}
+                    {'test': {'10': 0, '100': 1, '500': 1, '1000': 1, '2000': 1, '3000': 1, '5000': 1, '7000': 1, '10000': 1, 'inf': 1, 'sum': 42.0}}}}
         expected_result = defaultdict(lambda: {}, expected_struct)
         self.assertEqual(self.collector.histograms, expected_result)
 
@@ -353,6 +363,7 @@ class TestDruidCollector(unittest.TestCase):
                      'metric': 'query/time', 'value': 5}
         self.collector.register_datapoint(datapoint)
         expected_result['query/time']['historical']['test2'] = {'10': 1, '100': 1, '500': 1, '1000': 1,
+                                                                '2000': 1, '3000': 1, '5000': 1, '7000': 1,
                                                                 '10000': 1, 'inf': 1, 'sum': 5.0}
         self.assertEqual(self.collector.histograms, expected_result)
 
@@ -360,7 +371,7 @@ class TestDruidCollector(unittest.TestCase):
                      'metric': 'query/time', 'value': 42}
         self.collector.register_datapoint(datapoint)
         expected_result['query/time']['broker'] = {
-            'test': {'10': 0, '100': 1, '500': 1, '1000': 1,  '10000': 1, 'inf': 1, 'sum': 42.0}}
+            'test': {'10': 0, '100': 1, '500': 1, '1000': 1, '2000': 1, '3000': 1, '5000': 1, '7000': 1, '10000': 1, 'inf': 1, 'sum': 42.0}}
         self.assertEqual(self.collector.histograms, expected_result)
 
         datapoint = {'feed': 'metrics', 'service': 'druid/broker', 'dataSource': 'test',
@@ -377,6 +388,7 @@ class TestDruidCollector(unittest.TestCase):
                      'metric': 'query/time', 'value': 5}
         self.collector.register_datapoint(datapoint)
         expected_result['query/time']['broker']['test2'] = {'10': 1, '100': 1, '500': 1, '1000': 1,
+                                                            '2000': 1, '3000': 1, '5000': 1, '7000': 1,
                                                             '10000': 1, 'inf': 1, 'sum': 5.0}
         self.assertEqual(self.collector.histograms, expected_result)
 
@@ -733,29 +745,29 @@ class TestDruidCollector(unittest.TestCase):
             "host":"ip-10-0-5-124.ec2.internal:9082","version":"0.12.3",
             "metric":"jetty/numOpenConnections","value":12},
 
-            {"feed":"metrics","timestamp":"2019-04-05T18:27:49.812Z","service":"druid/broker",
-            "host":"ip-10-0-5-240.ec2.internal:9080","version":"0.12.3",
-            "metric":"query/failed/count","value":0},
+            {"feed":"metrics", "timestamp":"2019-08-16T13:27:50.945Z", "service":"druid/broker",
+             "host":"druid1001.eqiad.wmnet:8082", "metric":"query/count", "value":223},
 
-            {"feed":"metrics","timestamp":"2019-04-05T18:18:49.811Z","service":"druid/broker",
-            "host":"ip-10-0-5-240.ec2.internal:9080","version":"0.12.3",
-            "metric":"query/success/count","value":60},
-            
-            {"feed":"metrics","timestamp":"2019-04-05T18:27:49.812Z","service":"druid/broker",
-            "host":"ip-10-0-5-240.ec2.internal:9080","version":"0.12.3",
-            "metric":"query/interrupted/count","value":0},  
-            
-            {"feed":"metrics","timestamp":"2019-04-05T18:27:49.812Z","service":"druid/historical",
-            "host":"ip-10-0-5-240.ec2.internal:9080","version":"0.12.3",
-            "metric":"query/failed/count","value":0},
+            {"feed":"metrics", "timestamp":"2019-08-16T13:27:50.945Z", "service":"druid/broker",
+             "host":"druid1001.eqiad.wmnet:8082", "metric":"query/success/count", "value":223},
 
-            {"feed":"metrics","timestamp":"2019-04-05T18:18:49.811Z","service":"druid/historical",
-            "host":"ip-10-0-5-240.ec2.internal:9080","version":"0.12.3",
-            "metric":"query/success/count","value":60},
-            
-            {"feed":"metrics","timestamp":"2019-04-05T18:27:49.812Z","service":"druid/historical",
-            "host":"ip-10-0-5-240.ec2.internal:9080","version":"0.12.3",
-            "metric":"query/interrupted/count","value":0},                                                      
+            {"feed":"metrics", "timestamp":"2019-08-16T13:27:50.945Z", "service":"druid/broker",
+             "host":"druid1001.eqiad.wmnet:8082", "metric":"query/interrupted/count", "value":0},
+
+            {"feed":"metrics", "timestamp":"2019-08-16T13:27:50.946Z", "service":"druid/broker",
+             "host":"druid1001.eqiad.wmnet:8082", "metric":"query/failed/count", "value":0},
+
+            {"feed":"metrics", "timestamp":"2019-08-16T13:27:50.945Z", "service":"druid/historical",
+             "host":"druid1001.eqiad.wmnet:8082", "metric":"query/count", "value":223},
+
+            {"feed":"metrics", "timestamp":"2019-08-16T13:27:50.945Z", "service":"druid/historical",
+             "host":"druid1001.eqiad.wmnet:8082", "metric":"query/success/count", "value":223},
+
+            {"feed":"metrics", "timestamp":"2019-08-16T13:27:50.945Z", "service":"druid/historical",
+             "host":"druid1001.eqiad.wmnet:8082", "metric":"query/interrupted/count", "value":0},
+
+            {"feed":"metrics", "timestamp":"2019-08-16T13:27:50.946Z", "service":"druid/historical",
+             "host":"druid1001.eqiad.wmnet:8082", "metric":"query/failed/count", "value":0}
         ]
 
         # The following datapoint registration batch should not generate
@@ -779,7 +791,7 @@ class TestDruidCollector(unittest.TestCase):
 
         # Number of metrics pushed using register_datapoint plus the ones
         # generated by the exporter for bookeeping,
-        # like druid_exporter_datapoints_registered_count
+        # like druid_exporter_datapoints_registered_total
         expected_druid_metrics_len = len(datapoints) + 1
         self.assertEqual(collected_metrics, expected_druid_metrics_len)
 
