@@ -174,6 +174,33 @@ INGEST_METRICS = {
     'ingest/sink/count': {**INGEST_METRIC},
 }
 
+JVM_POOL_METRIC = {
+    'labels': ['poolKind', 'poolName'],
+    'type': 'gauge',
+    'suffix': '_bytes',
+}
+
+# these metrics are reported by the JvmMonitor option
+JVMMONITOR_METRICS = {
+    'jvm/pool/committed':   {**JVM_POOL_METRIC},
+    'jvm/pool/init':        {**JVM_POOL_METRIC},
+    'jvm/pool/max':         {**JVM_POOL_METRIC},
+    'jvm/pool/used':        {**JVM_POOL_METRIC},
+
+    'jvm/bufferpool/count':       { 'labels': [ 'bufferpoolName' ], 'suffix': '' },
+    'jvm/bufferpool/used':        { 'labels': [ 'bufferpoolName' ], 'suffix': '_bytes' },
+    'jvm/bufferpool/capacity':    { 'labels': [ 'bufferpoolName' ], 'suffix': '' },
+
+    'jvm/mem/committed':  { 'labels': [ 'memKind' ], 'suffix': '_bytes' },
+    'jvm/mem/init':       { 'labels': [ 'memKind' ], 'suffix': '_bytes' },
+    'jvm/mem/max':        { 'labels': [ 'memKind' ], 'suffix': '_bytes' },
+    'jvm/mem/used':       { 'labels': [ 'memKind' ], 'suffix': '_bytes' },
+
+    'jvm/gc/count': { 'labels': [ 'gcName', 'gcGen' ], 'suffix': '' },
+    'jvm/gc/cpu':   { 'labels': [ 'gcName', 'gcGen' ], 'suffix': '_ns' },
+}
+
+
 MINUTE = 60000
 
 INDEXING_SERVICE_METRICS = {
@@ -220,6 +247,7 @@ class DruidCollector(object):
                 **QUERY_COUNT_STATS,
                 **INGEST_METRICS,
                 **SEGMENT_METRICS,
+                **JVMMONITOR_METRICS,
             },
             'realtime': {
                 **JETTY_METRICS,
