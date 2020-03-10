@@ -159,6 +159,8 @@ class DruidCollector(object):
             'ingest/persists/failed',
             'ingest/handoff/failed',
             'ingest/handoff/count',
+            'ingest/events/duplicate',
+            'ingest/kafka/lag',
         ])
 
     @staticmethod
@@ -200,6 +202,17 @@ class DruidCollector(object):
                'druid_realtime_ingest_handoff_count',
                'Number of times handoff has happened.',
                labels=['datasource']),
+            'ingest/events/duplicate': GaugeMetricFamily(
+                'druid_realtime_ingest_events_duplicate_count',
+                'Number of events rejected because the events are duplicated.',
+                labels=['datasource']),
+            'ingest/kafka/lag': GaugeMetricFamily(
+                'druid_realtime_ingest_kafka_lag',
+                'Total lag between the offsets consumed by the Kafka '
+                'indexing tasks and latest offsets in Kafka brokers '
+                'across all partitions. Minimum emission period for '
+                'this metric is a minute.',
+                labels=['datasource']),
         }
 
     def _get_query_histograms(self, daemon):
