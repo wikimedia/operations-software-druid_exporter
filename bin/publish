@@ -1,0 +1,17 @@
+#!/bin/bash -eu
+
+BUILD_NUMBER="$(date -u +%Y%m%dT%H%M%S)_$(git rev-parse --short HEAD)"
+BUILD_ENV='production'
+
+echo "Building and deploying druid-exporter $BUILD_NUMBER..."
+
+DOCKER_IMAGE_NAME="docker.m6r.eu/druid-metrics-exporter"
+DOCKER_IMAGE_TAG="${DOCKER_IMAGE_NAME}:prod-${BUILD_NUMBER}"
+
+docker build -t "${DOCKER_IMAGE_NAME}:prod-${BUILD_NUMBER}" \
+    -t "${DOCKER_IMAGE_NAME}:latest" \
+    --build-arg BUILD_NUMBER=${BUILD_NUMBER} \
+    --build-arg BUILD_ENV=${BUILD_ENV} .
+
+docker push "${DOCKER_IMAGE_NAME}:prod-${BUILD_NUMBER}"
+docker push "${DOCKER_IMAGE_NAME}:latest"
