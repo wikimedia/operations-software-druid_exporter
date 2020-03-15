@@ -89,9 +89,11 @@ class DruidCollector(object):
             'peon': {
                 'query/time': ['dataSource'],
                 'query/bytes': ['dataSource'],
+                'ingest/events/duplicate': ['dataSource'],
                 'ingest/events/thrownAway': ['dataSource'],
                 'ingest/events/unparseable': ['dataSource'],
                 'ingest/events/processed': ['dataSource'],
+                'ingest/kafka/lag': ['dataSource'],
                 'ingest/rows/output': ['dataSource'],
                 'ingest/persists/count': ['dataSource'],
                 'ingest/persists/failed': ['dataSource'],
