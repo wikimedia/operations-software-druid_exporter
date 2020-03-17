@@ -86,7 +86,10 @@ class DruidCollector(object):
                 'segment/size': ['dataSource'],
                 'segment/unavailable/count': ['dataSource'],
                 'segment/underReplicated/count': ['tier', 'dataSource'],
-                'jetty/numOpenConnections': None,                
+                'jetty/numOpenConnections': None,
+                'ingest/kafka/lag': ['dataSource'],
+                'ingest/kafka/maxLag': ['dataSource'],
+                'ingest/kafka/avgLag': ['dataSource'],
             },
             'peon': {
                 'query/time': ['dataSource'],
@@ -179,6 +182,9 @@ class DruidCollector(object):
             'ingest/handoff/failed',
             'ingest/handoff/count',
             'jetty/numOpenConnections',
+            'ingest/kafka/lag',
+            'ingest/kafka/maxLag',
+            'ingest/kafka/avgLag',
         ])
 
     @staticmethod
@@ -364,6 +370,18 @@ class DruidCollector(object):
             'jetty/numOpenConnections': GaugeMetricFamily(
                'druid_coordinator_jetty_numOpenConnections',
                'Number of open jetty connections.',
+               labels=['datasource']),
+            'ingest/kafka/lag': GaugeMetricFamily(
+               'druid_coordinator_ingest_kafka_lag',
+               'lag over all partitions',
+               labels=['datasource']),
+            'ingest/kafka/maxLag': GaugeMetricFamily(
+               'druid_coordinator_ingest_kafka_maxLag',
+               'max lag on any one partition',
+               labels=['datasource']),
+            'ingest/kafka/avgLag': GaugeMetricFamily(
+               'druid_coordinator_ingest_kafka_avgLag',
+               'avg lag per partition',
                labels=['datasource']),
             }
 
