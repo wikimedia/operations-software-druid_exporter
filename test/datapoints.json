@@ -1,0 +1,694 @@
+[
+  {
+    "feed": "metrics",
+    "timestamp": "2017-11-14T16:25:01.395Z",
+    "service": "druid/broker",
+    "host": "druid1001.eqiad.wmnet:8082",
+    "metric": "query/time",
+    "value": 10,
+    "context": "{\"queryId\":\"b09649a1-a440-463f-8b7e-6b476cc22d45\",\"timeout\":40000}",
+    "dataSource": "NavigationTiming",
+    "duration": "PT94670899200S",
+    "hasFilters": "false",
+    "id": "b09649a1-a440-463f-8b7e-6b476cc22d45",
+    "interval": [
+      "0000-01-01T00:00:00.000Z/3000-01-01T00:00:00.000Z"
+    ],
+    "remoteAddress": "10.64.53.26",
+    "success": "true",
+    "type": "timeBoundary",
+    "version": "0.9.2"
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2017-11-14T16:25:01.395Z",
+    "service": "druid/historical",
+    "host": "druid1001.eqiad.wmnet:8082",
+    "metric": "query/time",
+    "value": 1,
+    "context": "{\"queryId\":\"b09649a1-a440-463f-8b7e-6b476cc22d45\",\"timeout\":40000}",
+    "dataSource": "NavigationTiming",
+    "duration": "PT94670899200S",
+    "hasFilters": "false",
+    "id": "b09649a1-a440-463f-8b7e-6b476cc22d45",
+    "interval": [
+      "0000-01-01T00:00:00.000Z/3000-01-01T00:00:00.000Z"
+    ],
+    "remoteAddress": "10.64.53.26",
+    "success": "true",
+    "type": "timeBoundary",
+    "version": "0.9.2"
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2017-12-06T11:59:35.682Z",
+    "service": "druid/peon",
+    "host": "druid1001.eqiad.wmnet:8101",
+    "metric": "query/time",
+    "value": 9,
+    "context": "{\"finalize\":false}",
+    "dataSource": "banner_activity_minutely",
+    "duration": "PT3600S",
+    "hasFilters": "false",
+    "id": "aab8a8af-f338-42af-86da-ffdc05a2bcd2",
+    "interval": [
+      "2017-12-06T11:00:00.000Z/2017-12-06T12:00:00.000Z"
+    ],
+    "remoteAddress": "10.64.5.101",
+    "success": "true",
+    "type": "timeBoundary",
+    "version": "0.9.2"
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2017-12-06T11:59:35.682Z",
+    "service": "druid/peon",
+    "host": "druid1001.eqiad.wmnet:8101",
+    "metric": "query/bytes",
+    "value": 85,
+    "context": "{\"finalize\":false}",
+    "dataSource": "banner_activity_minutely",
+    "duration": "PT3600S",
+    "hasFilters": "false",
+    "id": "aab8a8af-f338-42af-86da-ffdc05a2bcd2",
+    "interval": [
+      "2017-12-06T11:00:00.000Z/2017-12-06T12:00:00.000Z"
+    ],
+    "remoteAddress": "10.64.5.101",
+    "type": "timeBoundary",
+    "version": "0.9.2"
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2017-11-14T13:11:55.581Z",
+    "service": "druid/broker",
+    "host": "druid1001.eqiad.wmnet:8083",
+    "metric": "query/bytes",
+    "value": 1015,
+    "context": "{\"bySegment\":true,\"finalize\":false,\"populateCache\":false,\"priority\": 0,\"queryId\":\"d96c4b73-8e9b-4a43-821d-f194b4e134d7\",\"timeout\":40000}",
+    "dataSource": "webrequest",
+    "duration": "PT3600S",
+    "hasFilters": "false",
+    "id": "d96c4b73-8e9b-4a43-821d-f194b4e134d7",
+    "interval": [
+      "2017-11-14T11:00:00.000Z/2017-11-14T12:00:00.000Z"
+    ],
+    "remoteAddress": "10.64.5.101",
+    "type": "segmentMetadata",
+    "version": "0.9.2"
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2017-11-14T13:11:55.581Z",
+    "service": "druid/historical",
+    "host": "druid1001.eqiad.wmnet:8083",
+    "metric": "query/bytes",
+    "value": 1015,
+    "context": "{\"bySegment\":true,\"finalize\":false,\"populateCache\":false,'\"priority\": 0,\"queryId\":\"d96c4b73-8e9b-4a43-821d-f194b4e134d7\",\"timeout\":40000}",
+    "dataSource": "webrequest",
+    "duration": "PT3600S",
+    "hasFilters": "false",
+    "id": "d96c4b73-8e9b-4a43-821d-f194b4e134d7",
+    "interval": [
+      "2017-11-14T11:00:00.000Z/2017-11-14T12:00:00.000Z"
+    ],
+    "remoteAddress": "10.64.5.101",
+    "type": "segmentMetadata",
+    "version": "0.9.2"
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2017-11-14T16:25:39.217Z",
+    "service": "druid/broker",
+    "host": "druid1001.eqiad.wmnet:8082",
+    "metric": "query/cache/total/numEntries",
+    "value": 5350
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2017-11-14T16:25:39.217Z",
+    "service": "druid/historical",
+    "host": "druid1001.eqiad.wmnet:8082",
+    "metric": "query/cache/total/numEntries",
+    "value": 5351
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2017-11-14T16:25:39.217Z",
+    "service": "druid/broker",
+    "host": "druid1001.eqiad.wmnet:8082",
+    "metric": "query/cache/total/sizeBytes",
+    "value": 23951932
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2017-11-14T16:25:39.217Z",
+    "service": "druid/historical",
+    "host": "druid1001.eqiad.wmnet:8082",
+    "metric": "query/cache/total/sizeBytes",
+    "value": 2391931
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2017-11-14T16:25:39.217Z",
+    "service": "druid/broker",
+    "host": "druid1001.eqiad.wmnet:8082",
+    "metric": "query/cache/total/hits",
+    "value": 358547
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2017-11-14T16:25:39.217Z",
+    "service": "druid/historical",
+    "host": "druid1001.eqiad.wmnet:8082",
+    "metric": "query/cache/total/hits",
+    "value": 358548
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2017-11-14T13:08:20.820Z",
+    "service": "druid/broker",
+    "host": "druid1001.eqiad.wmnet:8082",
+    "metric": "query/cache/total/misses",
+    "value": 188
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2017-11-14T13:08:20.820Z",
+    "service": "druid/historical",
+    "host": "druid1001.eqiad.wmnet:8083",
+    "metric": "query/cache/total/misses",
+    "value": 1887
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2017-11-14T13:08:20.820Z",
+    "service": "druid/broker",
+    "host": "druid1001.eqiad.wmnet:8083",
+    "metric": "query/cache/total/evictions",
+    "value": 0
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2017-11-14T13:08:20.820Z",
+    "service": "druid/historical",
+    "host": "druid1001.eqiad.wmnet:8083",
+    "metric": "query/cache/total/evictions",
+    "value": 0
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2017-11-14T16:25:39.217Z",
+    "service": "druid/broker",
+    "host": "druid1001.eqiad.wmnet:8082",
+    "metric": "query/cache/total/timeouts",
+    "value": 0
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2017-11-14T16:25:39.217Z",
+    "service": "druid/historical",
+    "host": "druid1001.eqiad.wmnet:8082",
+    "metric": "query/cache/total/timeouts",
+    "value": 0
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2017-11-14T16:25:39.217Z",
+    "service": "druid/broker",
+    "host": "druid1001.eqiad.wmnet:8082",
+    "metric": "query/cache/total/errors",
+    "value": 0
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2017-11-14T16:25:39.217Z",
+    "service": "druid/historical",
+    "host": "druid1001.eqiad.wmnet:8082",
+    "metric": "query/cache/total/errors",
+    "value": 0
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2017-11-14T13:07:20.823Z",
+    "service": "druid/historical",
+    "host": "druid1001.eqiad.wmnet:8083",
+    "metric": "segment/count",
+    "value": 41,
+    "dataSource": "netflow",
+    "priority": "0",
+    "tier": "_default_tier"
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2017-11-14T12:14:53.697Z",
+    "service": "druid/coordinator",
+    "host": "druid1001.eqiad.wmnet: 8081",
+    "metric": "segment/count",
+    "value": 56,
+    "dataSource": "netflow"
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2017-12-07T09:55:04.937Z",
+    "service": "druid/historical",
+    "host": "druid1001.eqiad.wmnet:8083",
+    "metric": "segment/used",
+    "value": 3252671142,
+    "dataSource": "banner_activity_minutely",
+    "priority": "0",
+    "tier": "_default_tier"
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2017-11-14T13:08:20.820Z",
+    "service": "druid/historical",
+    "host": "druid1001.eqiad.wmnet:8083",
+    "metric": "segment/max",
+    "value": 2748779069440
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2017-11-14T13:08:20.819Z",
+    "service": "druid/historical",
+    "host": "druid1001.eqiad.wmnet:8083",
+    "metric": "segment/scan/pending",
+    "value": 0
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2017-11-14T16:15:15.577Z",
+    "service": "druid/coordinator",
+    "host": "druid1001.eqiad.wmnet:8081",
+    "metric": "segment/assigned/count",
+    "value": 0.0,
+    "tier": "_default_tier"
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2017-11-14T16:19:46.564Z",
+    "service": "druid/coordinator",
+    "host": "druid1001.eqiad.wmnet:8081",
+    "metric": "segment/moved/count",
+    "value": 0.0,
+    "tier": "_default_tier"
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2017-11-14T16:19:46.564Z",
+    "service": "druid/coordinator",
+    "host": "druid1001.eqiad.wmnet:8081",
+    "metric": "segment/dropped/count",
+    "value": 0.0,
+    "tier": "_default_tier"
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2017-11-14T16:19:46.564Z",
+    "service": "druid/coordinator",
+    "host": "druid1001.eqiad.wmnet:8081",
+    "metric": "segment/deleted/count",
+    "value": 0.0,
+    "tier": "_default_tier"
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2017-11-14T16:19:46.564Z",
+    "service": "druid/coordinator",
+    "host": "druid1001.eqiad.wmnet:8081",
+    "metric": "segment/unneeded/count",
+    "value": 0.0,
+    "tier": "_default_tier"
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2017-11-14T16:19:46.564Z",
+    "service": "druid/coordinator",
+    "host": "druid1001.eqiad.wmnet:8081",
+    "metric": "segment/overShadowed/count",
+    "value": 0.0
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2017-11-14T16:25:47.866Z",
+    "service": "druid/coordinator",
+    "host": "druid1001.eqiad.wmnet:8081",
+    "metric": "segment/loadQueue/failed",
+    "value": 0,
+    "server": "druid1003.eqiad.wmnet:8083"
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2017-11-14T16:25:47.866Z",
+    "service": "druid/coordinator",
+    "host": "druid1001.eqiad.wmnet:8081",
+    "metric": "segment/loadQueue/count",
+    "value": 0,
+    "server": "druid1003.eqiad.wmnet:8083"
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2017-11-14T16:25:47.866Z",
+    "service": "druid/coordinator",
+    "host": "druid1001.eqiad.wmnet:8081",
+    "metric": "segment/dropQueue/count",
+    "value": 0,
+    "server": "druid1003.eqiad.wmnet:8083"
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2017-11-14T16:27:18.196Z",
+    "service": "druid/coordinator",
+    "host": "druid1001.eqiad.wmnet:8081",
+    "metric": "segment/size",
+    "value": 12351349,
+    "dataSource": "unique_devices_per_project_family_daily"
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2017-11-14T16:27:18.189Z",
+    "service": "druid/coordinator",
+    "host": "druid1001.eqiad.wmnet:8081",
+    "metric": "segment/unavailable/count",
+    "value": 0,
+    "dataSource": "unique_devices_per_domain_monthly"
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2017-11-14T16:27:48.310Z",
+    "service": "druid/coordinator",
+    "host": "druid1001.eqiad.wmnet:8081",
+    "metric": "segment/underReplicated/count",
+    "value": 0,
+    "dataSource": "unique_devices_per_project_family_monthly",
+    "tier": "_default_tier"
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2017-12-06T12:12:14.747Z",
+    "service": "druid/peon",
+    "host": "druid1001.eqiad.wmnet:8101",
+    "metric": "ingest/events/thrownAway",
+    "value": 0,
+    "dataSource": "banner_activity_minutely",
+    "taskId": [
+      "index_realtime_banner_activity_minutely_2017-12-06T11:00:00.000Z_2_0"
+    ]
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2017-12-06T12:12:14.747Z",
+    "service": "druid/peon",
+    "host": "druid1001.eqiad.wmnet:8101",
+    "metric": "ingest/events/unparseable",
+    "value": 0,
+    "dataSource": "banner_activity_minutely",
+    "taskId": [
+      "index_realtime_banner_activity_minutely_2017-12-06T11:00:00.000Z_2_0"
+    ]
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2017-12-06T12:12:14.748Z",
+    "service": "druid/peon",
+    "host": "druid1001.eqiad.wmnet:8101",
+    "metric": "ingest/events/processed",
+    "value": 0,
+    "dataSource": "banner_activity_minutely",
+    "taskId": [
+      "index_realtime_banner_activity_minutely_2017-12-06T11:00:00.000Z_2_0"
+    ]
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2017-12-06T12:12:14.749Z",
+    "service": "druid/peon",
+    "host": "druid1001.eqiad.wmnet:8101",
+    "metric": "ingest/rows/output",
+    "value": 0,
+    "dataSource": "banner_activity_minutely",
+    "taskId": [
+      "index_realtime_banner_activity_minutely_2017-12-06T11:00:00.000Z_2_0"
+    ]
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2017-12-06T12:12:14.749Z",
+    "service": "druid/peon",
+    "host": "druid1001.eqiad.wmnet:8101",
+    "metric": "ingest/persists/count",
+    "value": 0,
+    "dataSource": "banner_activity_minutely",
+    "taskId": [
+      "index_realtime_banner_activity_minutely_2017-12-06T11:00:00.000Z_2_0"
+    ]
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2017-12-06T12:12:14.750Z",
+    "service": "druid/peon",
+    "host": "druid1001.eqiad.wmnet:8101",
+    "metric": "ingest/persists/failed",
+    "value": 0,
+    "dataSource": "banner_activity_minutely",
+    "taskId": [
+      "index_realtime_banner_activity_minutely_2017-12-06T11:00:00.000Z_2_0"
+    ]
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2017-12-06T12:12:14.750Z",
+    "service": "druid/peon",
+    "host": "druid1001.eqiad.wmnet:8101",
+    "metric": "ingest/handoff/failed",
+    "value": 0,
+    "dataSource": "banner_activity_minutely",
+    "taskId": [
+      "index_realtime_banner_activity_minutely_2017-12-06T11:00:00.000Z_2_0"
+    ]
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2017-12-06T12:12:14.751Z",
+    "service": "druid/peon",
+    "host": "druid1001.eqiad.wmnet:8101",
+    "metric": "ingest/handoff/count",
+    "value": 0,
+    "dataSource": "banner_activity_minutely",
+    "taskId": [
+      "index_realtime_banner_activity_minutely_2017-12-06T11:00:00.000Z_2_0"
+    ]
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2019-08-16T13:27:50.945Z",
+    "service": "druid/broker",
+    "host": "druid1001.eqiad.wmnet:8082",
+    "metric": "query/count",
+    "value": 223
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2019-08-16T13:27:50.945Z",
+    "service": "druid/broker",
+    "host": "druid1001.eqiad.wmnet:8082",
+    "metric": "query/success/count",
+    "value": 223
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2019-08-16T13:27:50.945Z",
+    "service": "druid/broker",
+    "host": "druid1001.eqiad.wmnet:8082",
+    "metric": "query/interrupted/count",
+    "value": 0
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2019-08-16T13:27:50.946Z",
+    "service": "druid/broker",
+    "host": "druid1001.eqiad.wmnet:8082",
+    "metric": "query/failed/count",
+    "value": 0
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2019-08-16T13:27:50.945Z",
+    "service": "druid/historical",
+    "host": "druid1001.eqiad.wmnet:8082",
+    "metric": "query/count",
+    "value": 223
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2019-08-16T13:27:50.945Z",
+    "service": "druid/historical",
+    "host": "druid1001.eqiad.wmnet:8082",
+    "metric": "query/success/count",
+    "value": 223
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2019-08-16T13:27:50.945Z",
+    "service": "druid/historical",
+    "host": "druid1001.eqiad.wmnet:8082",
+    "metric": "query/interrupted/count",
+    "value": 0
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2019-08-16T13:27:50.946Z",
+    "service": "druid/historical",
+    "host": "druid1001.eqiad.wmnet:8082",
+    "metric": "query/failed/count",
+    "value": 0
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2020-03-17T05:57:40.807Z",
+    "service": "druid/overlord",
+    "host": "pankow.druid.private:8090",
+    "version": "0.12.3",
+    "metric": "task/run/time",
+    "value": 3793497,
+    "dataSource": "events-hour",
+    "taskStatus": "SUCCESS",
+    "taskType": "index_kafka"
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2020-03-17T05:57:55.018Z",
+    "service": "druid/overlord",
+    "host": "pankow.druid:8090",
+    "version": "0.12.3",
+    "metric": "segment/added/bytes",
+    "value": 35474494,
+    "dataSource": "ssp-hour",
+    "interval": "2020-03-17T05:00:00.000Z/2020-03-17T06:00:00.000Z",
+    "taskType": "index_kafka"
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2020-03-17T05:58:05.847Z",
+    "service": "druid/overlord",
+    "host": "pankow.druid:8090",
+    "version": "0.12.3",
+    "metric": "jetty/numOpenConnections",
+    "value": 210
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2020-03-17T05:58:38.841Z",
+    "service": "druid/overlord",
+    "host": "pankow.druid:8090",
+    "version": "0.12.3",
+    "metric": "ingest/kafka/lag",
+    "value": 5323,
+    "dataSource": "ssp-minute"
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2020-03-17T05:58:08.371Z",
+    "service": "druid/middleManager",
+    "host": "pankow.druid:8102",
+    "version": "0.12.3",
+    "metric": "ingest/events/messageGap",
+    "value": 742,
+    "dataSource": "ssp-hour",
+    "taskId": [
+      "index_kafka_ssp-hour_55b394aa25b6570_ofdffnoa"
+    ]
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2020-03-17T05:59:08.370Z",
+    "service": "druid/middleManager",
+    "host": "pankow.druid:8102",
+    "version": "0.12.3",
+    "metric": "ingest/events/thrownAway",
+    "value": 43,
+    "dataSource": "ssp-hour",
+    "taskId": [
+      "index_kafka_ssp-hour_55b394aa25b6570_ofdffnoa"
+    ]
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2020-03-17T05:59:08.370Z",
+    "service": "druid/middleManager",
+    "host": "pankow.druid:8102",
+    "version": "0.12.3",
+    "metric": "ingest/events/unparseable",
+    "value": 13,
+    "dataSource": "ssp-hour",
+    "taskId": [
+      "index_kafka_ssp-hour_55b394aa25b6570_ofdffnoa"
+    ]
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2020-03-17T05:59:08.370Z",
+    "service": "druid/middleManager",
+    "host": "pankow.druid:8102",
+    "version": "0.12.3",
+    "metric": "ingest/rows/output",
+    "value": 150000,
+    "dataSource": "ssp-hour",
+    "taskId": [
+      "index_kafka_ssp-hour_55b394aa25b6570_ofdffnoa"
+    ]
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2020-03-17T05:59:08.370Z",
+    "service": "druid/middleManager",
+    "host": "pankow.druid:8102",
+    "version": "0.12.3",
+    "metric": "ingest/persists/count",
+    "value": 2,
+    "dataSource": "ssp-hour",
+    "taskId": [
+      "index_kafka_ssp-hour_55b394aa25b6570_ofdffnoa"
+    ]
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2020-03-17T05:59:08.370Z",
+    "service": "druid/middleManager",
+    "host": "pankow.druid:8102",
+    "version": "0.12.3",
+    "metric": "ingest/persists/failed",
+    "value": 24,
+    "dataSource": "ssp-hour",
+    "taskId": [
+      "index_kafka_ssp-hour_55b394aa25b6570_ofdffnoa"
+    ]
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2020-03-17T07:10:54.219Z",
+    "service": "druid/overlord",
+    "host": "pankow.druid:8090",
+    "version": "0.12.3",
+    "metric": "segment/moved/bytes",
+    "value": 35253465,
+    "dataSource": "ssp-day",
+    "interval": "2020-03-17T00:00:00.000Z/2020-03-18T00:00:00.000Z",
+    "taskType": "index_kafka"
+  },
+  {
+    "feed": "metrics",
+    "timestamp": "2020-03-17T07:10:54.219Z",
+    "service": "druid/overlord",
+    "host": "pankow.druid:8090",
+    "version": "0.12.3",
+    "metric": "segment/nuked/bytes",
+    "value": 35253465,
+    "dataSource": "ssp-day",
+    "interval": "2020-03-17T00:00:00.000Z/2020-03-18T00:00:00.000Z",
+    "taskType": "index_kafka",
+    "taskId": [
+      "foobar"
+    ]
+  }
+]

@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import json
 import unittest
 
 from collections import defaultdict
@@ -246,6 +246,78 @@ class TestDruidCollector(unittest.TestCase):
                     'metric_name': 'druid_realtime_ingest_handoff_count',
                     'labels': ['dataSource'],
                 }
+            },
+            'overlord': {
+                'ingest/kafka/lag': {
+                    'metric_name': 'druid_overlord_ingest_kafka_lag',
+                    'labels': ['dataSource'],
+                },
+                'task/run/time': {
+                    'metric_name': 'druid_overlord_task_run_time_ms',
+                    'labels': ['dataSource', 'taskStatus', 'taskType', 'host'],
+                },
+                'segment/added/bytes': {
+                    'metric_name': 'druid_overlord_segment_added_bytes_count',
+                    'labels': ['dataSource', 'interval', 'taskId', 'taskType'],
+                },
+                'segment/moved/bytes': {
+                    'metric_name': 'druid_overlord_segment_moved_bytes_count',
+                    'labels': ['dataSource', 'interval', 'taskId', 'taskType'],
+                },
+                'segment/nuked/bytes': {
+                    'metric_name': 'druid_overlord_segment_nuked_bytes_count',
+                    'labels': ['dataSource', 'interval', 'taskId', 'taskType'],
+                },
+                'jetty/numOpenConnections': {
+                    'metric_name': 'druid_overlord_jetty_num_open_conenctions',
+                    'labels': None
+                }
+            },
+            'middleManager': {
+                'query/time': {
+                    'metric_name': 'druid_middlemanager_query_time_ms',
+                    'labels': ['dataSource']
+                },
+                'query/bytes': {
+                    'metric_name': 'druid_middlemanager_query_bytes',
+                    'labels': ['dataSource']
+                },
+                'ingest/events/thrownAway': {
+                    'metric_name': 'druid_middlemanager_ingest_events_thrown_away_count',
+                    'labels': ['dataSource'],
+                },
+                'ingest/events/unparseable': {
+                    'metric_name': 'druid_middlemanager_ingest_events_unparseable_count',
+                    'labels': ['dataSource'],
+                },
+                'ingest/events/processed': {
+                    'metric_name': 'druid_middlemanager_ingest_events_processed_count',
+                    'labels': ['dataSource'],
+                },
+                'ingest/rows/output': {
+                    'metric_name': 'druid_middlemanager_ingest_rows_output_count',
+                    'labels': ['dataSource'],
+                },
+                'ingest/persists/count': {
+                    'metric_name': 'druid_middlemanager_ingest_persists_count',
+                    'labels': ['dataSource'],
+                },
+                'ingest/persists/failed': {
+                    'metric_name': 'druid_middlemanager_ingest_persists_failed_count',
+                    'labels': ['dataSource'],
+                },
+                'ingest/handoff/failed': {
+                    'metric_name': 'druid_middlemanager_ingest_handoff_failed_count',
+                    'labels': ['dataSource'],
+                },
+                'ingest/events/messageGap': {
+                    'metric_name': 'druid_middlemanager_ingest_events_message_gap',
+                    'labels': ['dataSource'],
+                },
+                'ingest/handoff/count': {
+                    'metric_name': 'druid_middlemanager_ingest_handoff_count',
+                    'labels': ['dataSource'],
+                }
             }
         }
         self.metrics_without_labels = [
@@ -275,6 +347,7 @@ class TestDruidCollector(unittest.TestCase):
             'druid_historical_failed_query_count',
             'druid_historical_query_count',
             'druid_exporter_datapoints_registered_total',
+            'druid_overlord_jetty_num_open_connections'
         ]
 
     def test_store_histogram(self):
@@ -342,7 +415,7 @@ class TestDruidCollector(unittest.TestCase):
         datapoint = {'feed': 'metrics', 'service': 'druid/historical', 'dataSource': 'test',
                      'metric': 'segment/used', 'tier': '_default_tier', 'value': 42}
         self.collector.register_datapoint(datapoint)
-        expected_struct = {'segment/used': {'historical': {'_default_tier': {'test': 42.0}}}}
+        expected_struct = yield {'segment/used': {'historical': {'_default_tier': {'test': 42.0}}}}
         expected_result = defaultdict(lambda: {}, expected_struct)
         self.assertEqual(self.collector.counters, expected_result)
 
@@ -396,309 +469,8 @@ class TestDruidCollector(unittest.TestCase):
         """Add one datapoint for each metric and make sure that they render correctly
            when running collect()
         """
-        datapoints = [
-            {"feed": "metrics",
-             "timestamp": "2017-11-14T16:25:01.395Z",
-             "service": "druid/broker",
-             "host": "druid1001.eqiad.wmnet:8082",
-             "metric": "query/time",
-             "value": 10,
-             "context": "{\"queryId\":\"b09649a1-a440-463f-8b7e-6b476cc22d45\",\"timeout\":40000}",
-             "dataSource": "NavigationTiming",
-             "duration": "PT94670899200S", "hasFilters": "false",
-             "id": "b09649a1-a440-463f-8b7e-6b476cc22d45",
-             "interval": ["0000-01-01T00:00:00.000Z/3000-01-01T00:00:00.000Z"],
-             "remoteAddress": "10.64.53.26", "success": "true",
-             "type": "timeBoundary", "version": "0.9.2"},
-
-            {"feed": "metrics",
-             "timestamp": "2017-11-14T16:25:01.395Z",
-             "service": "druid/historical",
-             "host": "druid1001.eqiad.wmnet:8082",
-             "metric": "query/time",
-             "value": 1,
-             "context": "{\"queryId\":\"b09649a1-a440-463f-8b7e-6b476cc22d45\",\"timeout\":40000}",
-             "dataSource": "NavigationTiming",
-             "duration": "PT94670899200S", "hasFilters": "false",
-             "id": "b09649a1-a440-463f-8b7e-6b476cc22d45",
-             "interval": ["0000-01-01T00:00:00.000Z/3000-01-01T00:00:00.000Z"],
-             "remoteAddress": "10.64.53.26", "success": "true",
-             "type": "timeBoundary", "version": "0.9.2"},
-
-            {"feed": "metrics", "timestamp": "2017-12-06T11:59:35.682Z",
-             "service": "druid/peon", "host": "druid1001.eqiad.wmnet:8101",
-             "metric": "query/time", "value": 9,
-             "context": "{\"finalize\":false}",
-             "dataSource": "banner_activity_minutely",
-             "duration": "PT3600S", "hasFilters": "false",
-             "id": "aab8a8af-f338-42af-86da-ffdc05a2bcd2",
-             "interval": ["2017-12-06T11:00:00.000Z/2017-12-06T12:00:00.000Z"],
-             "remoteAddress": "10.64.5.101", "success": "true",
-             "type": "timeBoundary", "version": "0.9.2"},
-
-            {"feed": "metrics", "timestamp": "2017-12-06T11:59:35.682Z",
-             "service": "druid/peon", "host": "druid1001.eqiad.wmnet:8101",
-             "metric": "query/bytes", "value": 85,
-             "context": "{\"finalize\":false}",
-             "dataSource": "banner_activity_minutely",
-             "duration": "PT3600S", "hasFilters": "false",
-             "id": "aab8a8af-f338-42af-86da-ffdc05a2bcd2",
-             "interval": ["2017-12-06T11:00:00.000Z/2017-12-06T12:00:00.000Z"],
-             "remoteAddress": "10.64.5.101",
-             "type": "timeBoundary", "version": "0.9.2"},
-
-            {"feed": "metrics", "timestamp": "2017-11-14T13:11:55.581Z",
-             "service": "druid/broker", "host": "druid1001.eqiad.wmnet:8083",
-             "metric": "query/bytes", "value": 1015,
-             "context": "{\"bySegment\":true,\"finalize\":false,\"populateCache\":false,\
-                          \"priority\": 0,\"queryId\":\"d96c4b73-8e9b-4a43-821d-f194b4e134d7\",\
-                          \"timeout\":40000}",
-             "dataSource": "webrequest", "duration": "PT3600S",
-             "hasFilters": "false", "id": "d96c4b73-8e9b-4a43-821d-f194b4e134d7",
-             "interval": ["2017-11-14T11:00:00.000Z/2017-11-14T12:00:00.000Z"],
-             "remoteAddress": "10.64.5.101", "type": "segmentMetadata",
-             "version": "0.9.2"},
-
-            {"feed": "metrics", "timestamp": "2017-11-14T13:11:55.581Z",
-             "service": "druid/historical", "host": "druid1001.eqiad.wmnet:8083",
-             "metric": "query/bytes", "value": 1015,
-             "context": "{\"bySegment\":true,\"finalize\":false,\"populateCache\":false,\
-                         \"priority\": 0,\"queryId\":\"d96c4b73-8e9b-4a43-821d-f194b4e134d7\"\
-                         ,\"timeout\":40000}",
-             "dataSource": "webrequest", "duration": "PT3600S", "hasFilters": "false",
-             "id": "d96c4b73-8e9b-4a43-821d-f194b4e134d7",
-             "interval": ["2017-11-14T11:00:00.000Z/2017-11-14T12:00:00.000Z"],
-             "remoteAddress": "10.64.5.101", "type": "segmentMetadata",
-             "version": "0.9.2"},
-
-            {"feed": "metrics", "timestamp": "2017-11-14T16:25:39.217Z",
-             "service": "druid/broker", "host": "druid1001.eqiad.wmnet:8082",
-             "metric": "query/cache/total/numEntries", "value": 5350},
-
-            {"feed": "metrics", "timestamp": "2017-11-14T16:25:39.217Z",
-             "service": "druid/historical", "host": "druid1001.eqiad.wmnet:8082",
-             "metric": "query/cache/total/numEntries", "value": 5351},
-
-            {"feed": "metrics", "timestamp": "2017-11-14T16:25:39.217Z",
-             "service": "druid/broker", "host": "druid1001.eqiad.wmnet:8082",
-             "metric": "query/cache/total/sizeBytes", "value": 23951932},
-
-            {"feed": "metrics", "timestamp": "2017-11-14T16:25:39.217Z",
-             "service": "druid/historical", "host": "druid1001.eqiad.wmnet:8082",
-             "metric": "query/cache/total/sizeBytes", "value": 2391931},
-
-            {"feed": "metrics",
-             "timestamp": "2017-11-14T16:25:39.217Z", "service": "druid/broker",
-             "host": "druid1001.eqiad.wmnet:8082",
-             "metric": "query/cache/total/hits", "value": 358547},
-
-            {"feed": "metrics",
-             "timestamp": "2017-11-14T16:25:39.217Z", "service": "druid/historical",
-             "host": "druid1001.eqiad.wmnet:8082",
-             "metric": "query/cache/total/hits", "value": 358548},
-
-            {"feed": "metrics", "timestamp": "2017-11-14T13:08:20.820Z",
-             "service": "druid/broker", "host": "druid1001.eqiad.wmnet:8082",
-             "metric": "query/cache/total/misses", "value": 188},
-
-            {"feed": "metrics", "timestamp": "2017-11-14T13:08:20.820Z",
-             "service": "druid/historical", "host": "druid1001.eqiad.wmnet:8083",
-             "metric": "query/cache/total/misses", "value": 1887},
-
-            {"feed": "metrics", "timestamp": "2017-11-14T13:08:20.820Z",
-             "service": "druid/broker", "host": "druid1001.eqiad.wmnet:8083",
-             "metric": "query/cache/total/evictions", "value": 0},
-
-            {"feed": "metrics", "timestamp": "2017-11-14T13:08:20.820Z",
-             "service": "druid/historical", "host": "druid1001.eqiad.wmnet:8083",
-             "metric": "query/cache/total/evictions", "value": 0},
-
-            {"feed": "metrics", "timestamp": "2017-11-14T16:25:39.217Z",
-             "service": "druid/broker", "host": "druid1001.eqiad.wmnet:8082",
-             "metric": "query/cache/total/timeouts", "value": 0},
-
-            {"feed": "metrics", "timestamp": "2017-11-14T16:25:39.217Z",
-             "service": "druid/historical", "host": "druid1001.eqiad.wmnet:8082",
-             "metric": "query/cache/total/timeouts", "value": 0},
-
-            {"feed": "metrics", "timestamp": "2017-11-14T16:25:39.217Z",
-             "service": "druid/broker", "host": "druid1001.eqiad.wmnet:8082",
-             "metric": "query/cache/total/errors", "value": 0},
-
-            {"feed": "metrics", "timestamp": "2017-11-14T16:25:39.217Z",
-             "service": "druid/historical", "host": "druid1001.eqiad.wmnet:8082",
-             "metric": "query/cache/total/errors", "value": 0},
-
-            {"feed": "metrics", "timestamp": "2017-11-14T13:07:20.823Z",
-             "service": "druid/historical", "host": "druid1001.eqiad.wmnet:8083",
-             "metric": "segment/count", "value": 41, "dataSource": "netflow",
-             "priority": "0", "tier": "_default_tier"},
-
-            {"feed": "metrics", "timestamp": "2017-11-14T12:14:53.697Z",
-             "service": "druid/coordinator", "host": "druid1001.eqiad.wmnet: 8081",
-             "metric": "segment/count", "value": 56, "dataSource": "netflow"},
-
-            {"feed": "metrics", "timestamp": "2017-12-07T09:55:04.937Z",
-             "service": "druid/historical", "host": "druid1001.eqiad.wmnet:8083",
-             "metric": "segment/used", "value": 3252671142,
-             "dataSource": "banner_activity_minutely",
-             "priority": "0", "tier": "_default_tier"},
-
-            {"feed": "metrics", "timestamp": "2017-11-14T13:08:20.820Z",
-             "service": "druid/historical", "host": "druid1001.eqiad.wmnet:8083",
-             "metric": "segment/max", "value": 2748779069440},
-
-            {"feed": "metrics", "timestamp": "2017-11-14T13:08:20.819Z",
-             "service": "druid/historical", "host": "druid1001.eqiad.wmnet:8083",
-             "metric": "segment/scan/pending", "value": 0},
-
-            {"feed": "metrics", "timestamp": "2017-11-14T16:15:15.577Z",
-             "service": "druid/coordinator",
-             "host": "druid1001.eqiad.wmnet:8081", "metric": "segment/assigned/count",
-             "value": 0.0, "tier": "_default_tier"},
-
-            {"feed": "metrics",
-             "timestamp": "2017-11-14T16:19:46.564Z",
-             "service": "druid/coordinator", "host": "druid1001.eqiad.wmnet:8081",
-             "metric": "segment/moved/count", "value": 0.0,
-             "tier": "_default_tier"},
-
-            {"feed": "metrics",
-             "timestamp": "2017-11-14T16:19:46.564Z",
-             "service": "druid/coordinator", "host": "druid1001.eqiad.wmnet:8081",
-             "metric": "segment/dropped/count",
-             "value": 0.0, "tier": "_default_tier"},
-
-            {"feed": "metrics",
-             "timestamp": "2017-11-14T16:19:46.564Z",
-             "service": "druid/coordinator", "host": "druid1001.eqiad.wmnet:8081",
-             "metric": "segment/deleted/count",
-             "value": 0.0, "tier": "_default_tier"},
-
-            {"feed": "metrics",
-             "timestamp": "2017-11-14T16:19:46.564Z",
-             "service": "druid/coordinator",
-             "host": "druid1001.eqiad.wmnet:8081", "metric": "segment/unneeded/count",
-             "value": 0.0, "tier": "_default_tier"},
-
-            {"feed": "metrics",
-             "timestamp": "2017-11-14T16:19:46.564Z",
-             "service": "druid/coordinator", "host": "druid1001.eqiad.wmnet:8081",
-             "metric": "segment/overShadowed/count", "value": 0.0},
-
-            {"feed": "metrics",
-             "timestamp": "2017-11-14T16:25:47.866Z",
-             "service": "druid/coordinator", "host": "druid1001.eqiad.wmnet:8081",
-             "metric": "segment/loadQueue/failed",
-             "value": 0, "server": "druid1003.eqiad.wmnet:8083"},
-
-            {"feed": "metrics",
-             "timestamp": "2017-11-14T16:25:47.866Z",
-             "service": "druid/coordinator",
-             "host": "druid1001.eqiad.wmnet:8081",
-             "metric": "segment/loadQueue/count",
-             "value": 0, "server": "druid1003.eqiad.wmnet:8083"},
-
-            {"feed": "metrics",
-             "timestamp": "2017-11-14T16:25:47.866Z",
-             "service": "druid/coordinator",
-             "host": "druid1001.eqiad.wmnet:8081",
-             "metric": "segment/dropQueue/count",
-             "value": 0, "server": "druid1003.eqiad.wmnet:8083"},
-
-            {"feed": "metrics",
-             "timestamp": "2017-11-14T16:27:18.196Z",
-             "service": "druid/coordinator",
-             "host": "druid1001.eqiad.wmnet:8081",
-             "metric": "segment/size", "value": 12351349,
-             "dataSource": "unique_devices_per_project_family_daily"},
-
-            {"feed": "metrics",
-             "timestamp": "2017-11-14T16:27:18.189Z",
-             "service": "druid/coordinator",
-             "host": "druid1001.eqiad.wmnet:8081",
-             "metric": "segment/unavailable/count",
-             "value": 0, "dataSource": "unique_devices_per_domain_monthly"},
-
-            {"feed": "metrics",
-             "timestamp": "2017-11-14T16:27:48.310Z",
-             "service": "druid/coordinator",
-             "host": "druid1001.eqiad.wmnet:8081",
-             "metric": "segment/underReplicated/count", "value": 0,
-             "dataSource": "unique_devices_per_project_family_monthly",
-             "tier": "_default_tier"},
-
-            {"feed": "metrics",
-             "timestamp": "2017-12-06T12:12:14.747Z",
-             "service": "druid/peon",
-             "host": "druid1001.eqiad.wmnet:8101",
-             "metric": "ingest/events/thrownAway", "value": 0,
-             "dataSource": "banner_activity_minutely",
-             "taskId": ["index_realtime_banner_activity_minutely_2017-12-06T11:00:00.000Z_2_0"]},
-
-            {"feed": "metrics", "timestamp": "2017-12-06T12:12:14.747Z",
-             "service": "druid/peon", "host": "druid1001.eqiad.wmnet:8101",
-             "metric": "ingest/events/unparseable", "value": 0,
-             "dataSource": "banner_activity_minutely",
-             "taskId": ["index_realtime_banner_activity_minutely_2017-12-06T11:00:00.000Z_2_0"]},
-
-            {"feed": "metrics", "timestamp": "2017-12-06T12:12:14.748Z",
-             "service": "druid/peon", "host": "druid1001.eqiad.wmnet:8101",
-             "metric": "ingest/events/processed", "value": 0,
-             "dataSource": "banner_activity_minutely",
-             "taskId": ["index_realtime_banner_activity_minutely_2017-12-06T11:00:00.000Z_2_0"]},
-
-            {"feed": "metrics", "timestamp": "2017-12-06T12:12:14.749Z",
-             "service": "druid/peon", "host": "druid1001.eqiad.wmnet:8101",
-             "metric": "ingest/rows/output", "value": 0, "dataSource": "banner_activity_minutely",
-             "taskId": ["index_realtime_banner_activity_minutely_2017-12-06T11:00:00.000Z_2_0"]},
-
-            {"feed": "metrics", "timestamp": "2017-12-06T12:12:14.749Z",
-             "service": "druid/peon", "host": "druid1001.eqiad.wmnet:8101",
-             "metric": "ingest/persists/count", "value": 0,
-             "dataSource": "banner_activity_minutely",
-             "taskId": ["index_realtime_banner_activity_minutely_2017-12-06T11:00:00.000Z_2_0"]},
-
-            {"feed": "metrics", "timestamp": "2017-12-06T12:12:14.750Z", "service": "druid/peon",
-             "host": "druid1001.eqiad.wmnet:8101", "metric": "ingest/persists/failed",
-             "value": 0, "dataSource": "banner_activity_minutely",
-             "taskId": ["index_realtime_banner_activity_minutely_2017-12-06T11:00:00.000Z_2_0"]},
-
-            {"feed": "metrics", "timestamp": "2017-12-06T12:12:14.750Z",
-             "service": "druid/peon", "host": "druid1001.eqiad.wmnet:8101",
-             "metric": "ingest/handoff/failed", "value": 0,
-             "dataSource": "banner_activity_minutely",
-             "taskId": ["index_realtime_banner_activity_minutely_2017-12-06T11:00:00.000Z_2_0"]},
-
-            {"feed": "metrics", "timestamp": "2017-12-06T12:12:14.751Z", "service": "druid/peon",
-             "host": "druid1001.eqiad.wmnet:8101", "metric": "ingest/handoff/count", "value": 0,
-             "dataSource": "banner_activity_minutely",
-             "taskId": ["index_realtime_banner_activity_minutely_2017-12-06T11:00:00.000Z_2_0"]},
-
-            {"feed":"metrics", "timestamp":"2019-08-16T13:27:50.945Z", "service":"druid/broker",
-             "host":"druid1001.eqiad.wmnet:8082", "metric":"query/count", "value":223},
-
-            {"feed":"metrics", "timestamp":"2019-08-16T13:27:50.945Z", "service":"druid/broker",
-             "host":"druid1001.eqiad.wmnet:8082", "metric":"query/success/count", "value":223},
-
-            {"feed":"metrics", "timestamp":"2019-08-16T13:27:50.945Z", "service":"druid/broker",
-             "host":"druid1001.eqiad.wmnet:8082", "metric":"query/interrupted/count", "value":0},
-
-            {"feed":"metrics", "timestamp":"2019-08-16T13:27:50.946Z", "service":"druid/broker",
-             "host":"druid1001.eqiad.wmnet:8082", "metric":"query/failed/count", "value":0},
-
-            {"feed":"metrics", "timestamp":"2019-08-16T13:27:50.945Z", "service":"druid/historical",
-             "host":"druid1001.eqiad.wmnet:8082", "metric":"query/count", "value":223},
-
-            {"feed":"metrics", "timestamp":"2019-08-16T13:27:50.945Z", "service":"druid/historical",
-             "host":"druid1001.eqiad.wmnet:8082", "metric":"query/success/count", "value":223},
-
-            {"feed":"metrics", "timestamp":"2019-08-16T13:27:50.945Z", "service":"druid/historical",
-             "host":"druid1001.eqiad.wmnet:8082", "metric":"query/interrupted/count", "value":0},
-
-            {"feed":"metrics", "timestamp":"2019-08-16T13:27:50.946Z", "service":"druid/historical",
-             "host":"druid1001.eqiad.wmnet:8082", "metric":"query/failed/count", "value":0}
-        ]
+        with open('datapoints.json', 'r') as data_file:
+            datapoints = json.load(data_file)
 
         # The following datapoint registration batch should not generate
         # any exception (breaking the test).
@@ -720,7 +492,7 @@ class TestDruidCollector(unittest.TestCase):
                 prometheus_metric_samples.append(metric.samples)
 
         # Number of metrics pushed using register_datapoint plus the ones
-        # generated by the exporter for bookeeping,
+        # generated by the exporter for bookkeeping,
         # like druid_exporter_datapoints_registered_total
         expected_druid_metrics_len = len(datapoints) + 1
         self.assertEqual(collected_metrics, expected_druid_metrics_len)
@@ -751,7 +523,8 @@ class TestDruidCollector(unittest.TestCase):
                     if prometheus_metric_name == sample[0][0]:
                         if prometheus_metric_labels:
                             for label in prometheus_metric_labels:
-                                self.assertTrue(label.lower() in sample[0][1])
+                                self.assertTrue(label in sample[0][1],
+                                                f'expected {label} label in {sample}')
                         else:
                             self.assertTrue(sample[0][1] == {})
                         break
