@@ -70,6 +70,7 @@ class DruidCollector(object):
                 'segment/max': None,
                 'segment/used': ['tier', 'dataSource'],
                 'segment/scan/pending': None,
+                'segment/usedPercent': ['tier', 'dataSource'],
                 'jetty/numOpenConnections': None
             },
             'coordinator': {
@@ -160,6 +161,7 @@ class DruidCollector(object):
             'segment/count',
             'segment/used',
             'segment/scan/pending',
+            'segment/usedPercent',
             'segment/assigned/count',
             'segment/moved/count',
             'segment/dropped/count',
@@ -304,6 +306,10 @@ class DruidCollector(object):
             'segment/scan/pending': GaugeMetricFamily(
                'druid_historical_segment_scan_pending',
                'Number of segments in queue waiting to be scanned.'),
+            'segment/usedPercent': GaugeMetricFamily(
+               'druid_historical_segment_usedPercent',
+               'Percent of space used on historical',
+               labels=['tier', 'datasource']),
             'jetty/numOpenConnections': GaugeMetricFamily(
                'druid_historical_jetty_numOpenConnections',
                'Number of open jetty connections.',
