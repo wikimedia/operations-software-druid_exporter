@@ -91,6 +91,12 @@ class DruidCollector(object):
                 'ingest/kafka/lag': ['dataSource'],
                 'ingest/kafka/maxLag': ['dataSource'],
                 'ingest/kafka/avgLag': ['dataSource'],
+                'task/success/count': ['dataSource'],
+                'task/failed/count': ['dataSource'],
+                'task/running/count': ['dataSource'],
+                'task/pending/count': ['dataSource'],
+                'task/waiting/count': ['dataSource'],
+                'compact/task/count': None,
             },
             'peon': {
                 'query/time': ['dataSource'],
@@ -187,6 +193,12 @@ class DruidCollector(object):
             'ingest/kafka/lag',
             'ingest/kafka/maxLag',
             'ingest/kafka/avgLag',
+            'task/success/count',
+            'task/failed/count',
+            'task/running/count',
+            'task/pending/count',
+            'task/waiting/count',
+            'compact/task/count'
         ])
 
     @staticmethod
@@ -389,6 +401,29 @@ class DruidCollector(object):
                'druid_coordinator_ingest_kafka_avgLag',
                'avg lag per partition',
                labels=['datasource']),
+            'task/success/count': GaugeMetricFamily(
+               'druid_coordinator_task_success_count',
+               'successful tasks',
+               labels=['datasource']),
+            'task/failed/count': GaugeMetricFamily(
+               'druid_coordinator_task_failed_count',
+               'failed tasks',
+               labels=['datasource']),
+            'task/running/count': GaugeMetricFamily(
+               'druid_coordinator_task_running_count',
+               'running tasks',
+               labels=['datasource']),
+            'task/pending/count': GaugeMetricFamily(
+               'druid_coordinator_task_pending_count',
+               'pending tasks',
+               labels=['datasource']),
+            'task/waiting/count': GaugeMetricFamily(
+               'druid_coordinator_task_waiting_count',
+               'waiting tasks',
+               labels=['datasource']),
+            'compact/task/count': GaugeMetricFamily(
+               'druid_coordinator_compact_task_count',
+               'compaction tasks submitted'),
             }
 
     def store_counter(self, datapoint):
