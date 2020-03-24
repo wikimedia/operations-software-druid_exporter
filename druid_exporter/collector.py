@@ -47,6 +47,7 @@ class DruidCollector(object):
                 'query/cache/total/evictions': None,
                 'query/cache/total/timeouts': None,
                 'query/cache/total/errors': None,
+                'query/cache/total/hitRate': None,
                 'query/count': None,
                 'query/success/count': None,
                 'query/failed/count': None,
@@ -62,6 +63,7 @@ class DruidCollector(object):
                 'query/cache/total/evictions': None,
                 'query/cache/total/timeouts': None,
                 'query/cache/total/errors': None,
+                'query/cache/total/hitRate': None,
                 'query/count': None,
                 'query/success/count': None,
                 'query/failed/count': None,
@@ -159,6 +161,7 @@ class DruidCollector(object):
             'query/cache/total/evictions',
             'query/cache/total/timeouts',
             'query/cache/total/errors',
+            'query/cache/total/hitRate',
             'query/count',
             'query/success/count',
             'query/failed/count',
@@ -284,6 +287,9 @@ class DruidCollector(object):
                'Number of cache timeouts.'),
             'query/cache/total/errors': GaugeMetricFamily(
                'druid_' + daemon + '_query_cache_errors_count',
+               'Number of cache errors.'),
+            'query/cache/total/hitRate': GaugeMetricFamily(
+               'druid_' + daemon + '_query_cache_hitRate',
                'Number of cache errors.'),
             }
     def _get_query_counters(self, daemon):
