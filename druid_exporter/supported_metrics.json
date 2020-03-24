@@ -1,0 +1,232 @@
+{
+  "broker": {
+    "query/time": [
+      "dataSource"
+    ],
+    "query/bytes": [
+      "dataSource"
+    ],
+    "query/cache/total/numEntries": null,
+    "query/cache/total/sizeBytes": null,
+    "query/cache/total/hits": null,
+    "query/cache/total/misses": null,
+    "query/cache/total/evictions": null,
+    "query/cache/total/timeouts": null,
+    "query/cache/total/errors": null,
+    "query/count": null,
+    "query/success/count": null,
+    "query/failed/count": null,
+    "query/interrupted/count": null
+  },
+  "historical": {
+    "query/time": [
+      "dataSource"
+    ],
+    "query/bytes": [
+      "dataSource"
+    ],
+    "query/cache/total/numEntries": null,
+    "query/cache/total/sizeBytes": null,
+    "query/cache/total/hits": null,
+    "query/cache/total/misses": null,
+    "query/cache/total/evictions": null,
+    "query/cache/total/timeouts": null,
+    "query/cache/total/errors": null,
+    "query/count": null,
+    "query/success/count": null,
+    "query/failed/count": null,
+    "query/interrupted/count": null,
+    "segment/count": [
+      "tier",
+      "dataSource"
+    ],
+    "segment/max": null,
+    "segment/used": [
+      "tier",
+      "dataSource"
+    ],
+    "segment/scan/pending": null
+  },
+  "coordinator": {
+    "segment/count": [
+      "dataSource"
+    ],
+    "segment/assigned/count": [
+      "tier"
+    ],
+    "segment/moved/count": [
+      "tier"
+    ],
+    "segment/dropped/count": [
+      "tier"
+    ],
+    "segment/deleted/count": [
+      "tier"
+    ],
+    "segment/unneeded/count": [
+      "tier"
+    ],
+    "segment/overShadowed/count": null,
+    "segment/loadQueue/failed": [
+      "server"
+    ],
+    "segment/loadQueue/count": [
+      "server"
+    ],
+    "segment/dropQueue/count": [
+      "server"
+    ],
+    "segment/size": [
+      "dataSource"
+    ],
+    "segment/unavailable/count": [
+      "dataSource"
+    ],
+    "segment/underReplicated/count": [
+      "tier",
+      "dataSource"
+    ]
+  },
+  "peon": {
+    "query/time": [
+      "dataSource"
+    ],
+    "query/bytes": [
+      "dataSource"
+    ],
+    "ingest/events/duplicate": [
+      "dataSource"
+    ],
+    "ingest/events/thrownAway": [
+      "dataSource"
+    ],
+    "ingest/events/unparseable": [
+      "dataSource"
+    ],
+    "ingest/events/processed": [
+      "dataSource"
+    ],
+    "ingest/kafka/lag": [
+      "dataSource"
+    ],
+    "ingest/rows/output": [
+      "dataSource"
+    ],
+    "ingest/persists/count": [
+      "dataSource"
+    ],
+    "ingest/persists/failed": [
+      "dataSource"
+    ],
+    "ingest/handoff/failed": [
+      "dataSource"
+    ],
+    "ingest/handoff/count": [
+      "dataSource"
+    ],
+    "ingest/sink/count": [
+      "dataSource"
+    ],
+    "ingest/events/messageGap": [
+      "dataSource"
+    ],
+    "jetty/numOpenConnections": [
+      "dataSource"
+    ],
+    "segment/scan/pending": null
+  },
+  "middlemanager": {
+    "query/time": [
+      "dataSource"
+    ],
+    "query/bytes": [
+      "dataSource"
+    ],
+    "ingest/events/duplicate": [
+      "dataSource"
+    ],
+    "ingest/events/thrownAway": [
+      "dataSource"
+    ],
+    "ingest/events/unparseable": [
+      "dataSource"
+    ],
+    "ingest/events/processed": [
+      "dataSource"
+    ],
+    "ingest/rows/output": [
+      "dataSource"
+    ],
+    "ingest/persists/count": [
+      "dataSource"
+    ],
+    "ingest/persists/failed": [
+      "dataSource"
+    ],
+    "ingest/handoff/failed": [
+      "dataSource"
+    ],
+    "ingest/handoff/count": [
+      "dataSource"
+    ],
+    "ingest/sink/count": [
+      "dataSource"
+    ],
+    "ingest/events/messageGap": [
+      "dataSource"
+    ],
+    "jetty/numOpenConnections": [
+      "dataSource"
+    ],
+    "segment/scan/pending": null,
+    "ingest/kafka/lag": [
+      "dataSource"
+    ]
+  },
+  "overlord": {
+    "task/run/time": [
+      "dataSource",
+      "taskStatus",
+      "taskType",
+      "host"
+    ],
+    "ingest/kafka/lag": [
+      "dataSource",
+      "host"
+    ],
+    "jetty/numOpenConnections": null,
+    "segment/added/bytes": [
+      "dataSource",
+      "interval",
+      "taskId",
+      "taskType"
+    ],
+    "segment/moved/bytes": [
+      "dataSource",
+      "interval",
+      "taskId",
+      "taskType"
+    ],
+    "segment/nuked/bytes": [
+      "dataSource",
+      "interval",
+      "taskId",
+      "taskType"
+    ],
+    "task/success/count": [
+      "dataSource"
+    ],
+    "task/failed/count": [
+      "dataSource"
+    ],
+    "task/running/count": [
+      "dataSource"
+    ],
+    "task/pending/count": [
+      "dataSource"
+    ],
+    "task/waiting/count": [
+      "dataSource"
+    ]
+  }
+}

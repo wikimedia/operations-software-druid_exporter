@@ -9,6 +9,6 @@ RUN python -m pip install virtualenv && \
     python -m virtualenv .venv && \
     .venv/bin/python setup.py install
 
-ENTRYPOINT [".venv/bin/druid_exporter", "-d"]
+ENTRYPOINT [".venv/bin/druid_exporter"]
 
 EXPOSE 8000

@@ -75,7 +75,7 @@ def main():
     if args.debug:
         logging.basicConfig(level=logging.DEBUG)
     else:
-        logging.basicConfig(level=logging.WARNING)
+        logging.basicConfig(level=logging.INFO)
 
     collect_metrics_from = []
 

@@ -8,6 +8,8 @@ setup(name='druid_exporter',
       author_email='ltoscano@wikimedia.org',
       license='Apache License, Version 2.0',
       packages=['druid_exporter'],
+      package_data={'druid_exporter': ['supported_metrics.json']},
+      include_package_data=True,
       install_requires=[
           'prometheus-client',
       ],
@@ -16,4 +18,4 @@ setup(name='druid_exporter',
               'druid_exporter = druid_exporter.exporter:main'
           ]
       },
-)
+      )

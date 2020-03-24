@@ -16,6 +16,8 @@ import json
 import unittest
 
 from collections import defaultdict
+from pathlib import Path
+
 from druid_exporter.collector import DruidCollector
 
 
@@ -49,19 +51,19 @@ class TestDruidCollector(unittest.TestCase):
                     'labels': None
                 },
                 'query/cache/total/misses': {
-                    'metric_name':'druid_broker_query_cache_hits_count',
+                    'metric_name': 'druid_broker_query_cache_hits_count',
                     'labels': None
                 },
                 'query/cache/total/evictions': {
-                    'metric_name':'druid_broker_query_cache_evictions_count',
+                    'metric_name': 'druid_broker_query_cache_evictions_count',
                     'labels': None
                 },
                 'query/cache/total/timeouts': {
-                    'metric_name':'druid_broker_query_cache_timeouts_count',
+                    'metric_name': 'druid_broker_query_cache_timeouts_count',
                     'labels': None
                 },
                 'query/cache/total/errors': {
-                    'metric_name':'druid_broker_query_cache_errors_count',
+                    'metric_name': 'druid_broker_query_cache_errors_count',
                     'labels': None
                 },
                 'query/count': {
@@ -103,19 +105,19 @@ class TestDruidCollector(unittest.TestCase):
                     'labels': None
                 },
                 'query/cache/total/misses': {
-                    'metric_name':'druid_historical_query_cache_hits_count',
+                    'metric_name': 'druid_historical_query_cache_hits_count',
                     'labels': None
                 },
                 'query/cache/total/evictions': {
-                    'metric_name':'druid_historical_query_cache_evictions_count',
+                    'metric_name': 'druid_historical_query_cache_evictions_count',
                     'labels': None
                 },
                 'query/cache/total/timeouts': {
-                    'metric_name':'druid_historical_query_cache_timeouts_count',
+                    'metric_name': 'druid_historical_query_cache_timeouts_count',
                     'labels': None
                 },
                 'query/cache/total/errors': {
-                    'metric_name':'druid_historical_query_cache_errors_count',
+                    'metric_name': 'druid_historical_query_cache_errors_count',
                     'labels': None
                 },
                 'segment/count': {
@@ -320,92 +322,14 @@ class TestDruidCollector(unittest.TestCase):
                 }
             }
         }
-        self.metrics_without_labels = [
-            'druid_historical_segment_scan_pending',
-            'druid_historical_max_segment_bytes',
-            'druid_coordinator_segment_overshadowed_count',
-            'druid_broker_query_cache_numentries_count',
-            'druid_broker_query_cache_size_bytes',
-            'druid_broker_query_cache_hits_count',
-            'druid_broker_query_cache_misses_count',
-            'druid_broker_query_cache_evictions_count',
-            'druid_broker_query_cache_timeouts_count',
-            'druid_broker_query_cache_errors_count',
-            'druid_broker_success_query_count',
-            'druid_broker_interrupted_query_count',
-            'druid_broker_failed_query_count',
-            'druid_broker_query_count',
-            'druid_historical_query_cache_numentries_count',
-            'druid_historical_query_cache_size_bytes',
-            'druid_historical_query_cache_hits_count',
-            'druid_historical_query_cache_misses_count',
-            'druid_historical_query_cache_evictions_count',
-            'druid_historical_query_cache_timeouts_count',
-            'druid_historical_query_cache_errors_count',
-            'druid_historical_success_query_count',
-            'druid_historical_interrupted_query_count',
-            'druid_historical_failed_query_count',
-            'druid_historical_query_count',
-            'druid_exporter_datapoints_registered_total',
-            'druid_overlord_jetty_num_open_connections'
-        ]
+        with open(Path(__file__).parent.parent / 'druid_exporter' / 'supported_metrics.json', 'r') as f:
+            conf = json.load(f)
+        self.metrics_without_labels = {'druid_exporter_datapoints_registered_total'}
 
-    def test_store_histogram(self):
-        """Check that multiple datapoints modify the self.histograms data-structure
-           in the expected way.
-        """
-        datapoint = {'feed': 'metrics', 'service': 'druid/historical', 'dataSource': 'test',
-                     'metric': 'query/time', 'value': 42}
-        self.collector.register_datapoint(datapoint)
-        expected_struct = {
-            'query/time': {
-                'historical':
-                    {'test': {'10': 0, '100': 1, '500': 1, '1000': 1, '2000': 1, '3000': 1, '5000': 1, '7000': 1, '10000': 1, 'inf': 1, 'sum': 42.0}}}}
-        expected_result = defaultdict(lambda: {}, expected_struct)
-        self.assertEqual(self.collector.histograms, expected_result)
-
-        datapoint = {'feed': 'metrics', 'service': 'druid/historical', 'dataSource': 'test',
-                     'metric': 'query/time', 'value': 5}
-        self.collector.register_datapoint(datapoint)
-        for bucket in expected_struct['query/time']['historical']['test']:
-            if bucket != 'sum':
-                expected_struct['query/time']['historical']['test'][bucket] += 1
-            else:
-                expected_struct['query/time']['historical']['test'][bucket] += 5
-        self.assertEqual(self.collector.histograms, expected_result)
-
-        datapoint = {'feed': 'metrics', 'service': 'druid/historical', 'dataSource': 'test2',
-                     'metric': 'query/time', 'value': 5}
-        self.collector.register_datapoint(datapoint)
-        expected_result['query/time']['historical']['test2'] = {'10': 1, '100': 1, '500': 1, '1000': 1,
-                                                                '2000': 1, '3000': 1, '5000': 1, '7000': 1,
-                                                                '10000': 1, 'inf': 1, 'sum': 5.0}
-        self.assertEqual(self.collector.histograms, expected_result)
-
-        datapoint = {'feed': 'metrics', 'service': 'druid/broker', 'dataSource': 'test',
-                     'metric': 'query/time', 'value': 42}
-        self.collector.register_datapoint(datapoint)
-        expected_result['query/time']['broker'] = {
-            'test': {'10': 0, '100': 1, '500': 1, '1000': 1, '2000': 1, '3000': 1, '5000': 1, '7000': 1, '10000': 1, 'inf': 1, 'sum': 42.0}}
-        self.assertEqual(self.collector.histograms, expected_result)
-
-        datapoint = {'feed': 'metrics', 'service': 'druid/broker', 'dataSource': 'test',
-                     'metric': 'query/time', 'value': 600}
-        self.collector.register_datapoint(datapoint)
-        for bucket in expected_struct['query/time']['broker']['test']:
-            if bucket == 'sum':
-                expected_struct['query/time']['broker']['test'][bucket] += 600
-            elif 600 <= float(bucket):
-                expected_struct['query/time']['broker']['test'][bucket] += 1
-        self.assertEqual(self.collector.histograms, expected_result)
-
-        datapoint = {'feed': 'metrics', 'service': 'druid/broker', 'dataSource': 'test2',
-                     'metric': 'query/time', 'value': 5}
-        self.collector.register_datapoint(datapoint)
-        expected_result['query/time']['broker']['test2'] = {'10': 1, '100': 1, '500': 1, '1000': 1,
-                                                            '2000': 1, '3000': 1, '5000': 1, '7000': 1,
-                                                            '10000': 1, 'inf': 1, 'sum': 5.0}
-        self.assertEqual(self.collector.histograms, expected_result)
+        for daemon in conf:
+            for metric, labels in conf[daemon].items():
+                if not labels:
+                    self.metrics_without_labels.add(f'druid_{daemon}_{DruidCollector._camel_case(metric)}')
 
     def test_store_counter(self):
         """Check that multiple datapoints modify the self.counters data-structure
@@ -494,8 +418,8 @@ class TestDruidCollector(unittest.TestCase):
         # Number of metrics pushed using register_datapoint plus the ones
         # generated by the exporter for bookkeeping,
         # like druid_exporter_datapoints_registered_total
-        expected_druid_metrics_len = len(datapoints) + 1
-        self.assertEqual(collected_metrics, expected_druid_metrics_len)
+        expected_druid_metrics_len = len(datapoints) + 3
+        self.assertEqual(expected_druid_metrics_len, collected_metrics)
 
         for datapoint in datapoints:
             metric = datapoint['metric']
@@ -544,7 +468,7 @@ class TestDruidCollector(unittest.TestCase):
                             else:
                                 raise RuntimeError(
                                     'Histogram sample not supported: {}'
-                                    .format(s))
+                                        .format(s))
                         assertEqual(sum_counter, 1)
                         assertEqual(count_counter, 1)
                         assertEqual(bucket_counter, 6)
@@ -552,8 +476,7 @@ class TestDruidCollector(unittest.TestCase):
                 else:
                     RuntimeError(
                         'The metric {} does not have a valid sample!'
-                        .format(metric))
-
+                            .format(metric))
 
     def test_register_datapoints_count(self):
         datapoints = [

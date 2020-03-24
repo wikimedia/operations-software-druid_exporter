@@ -1,0 +1,13 @@
+version: '2'
+networks:
+  service.ssp.consul:
+    external: true
+services:
+  druid-metrics-exporter:
+    build: .
+    container_name: druid-metrics_exporter
+    ports:
+      - '8000:8000'
+    command: '-d'
+    networks:
+      - 'service.ssp.consul'
