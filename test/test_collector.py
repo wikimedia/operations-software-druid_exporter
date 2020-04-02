@@ -65,6 +65,10 @@ class TestDruidCollector(unittest.TestCase):
                     'metric_name':'druid_broker_query_cache_errors_count',
                     'labels': None
                 },
+                'query/cache/total/hitRate': {
+                    'metric_name':'druid_broker_query_cache_hitRate',
+                    'labels': None
+                },
                 'query/count': {
                     'metric_name': 'druid_broker_query_count',
                     'labels': None,
@@ -119,6 +123,10 @@ class TestDruidCollector(unittest.TestCase):
                     'metric_name':'druid_historical_query_cache_errors_count',
                     'labels': None
                 },
+                'query/cache/total/hitRate': {
+                    'metric_name':'druid_historical_query_cache_hitRate',
+                    'labels': None
+                },
                 'segment/count': {
                     'metric_name': 'druid_historical_segment_count',
                     'labels': ['tier', 'dataSource']
@@ -134,6 +142,10 @@ class TestDruidCollector(unittest.TestCase):
                 'segment/scan/pending': {
                     'metric_name': 'druid_historical_segment_scan_pending',
                     'labels': None
+                },
+                'segment/usedPercent': {
+                    'metric_name': 'druid_historical_segment_usedPercent',
+                    'labels': ['tier', 'dataSource']
                 },
                 'jetty/numOpenConnections': {
                     'metric_name': 'druid_historical_jetty_numOpenConnections',
@@ -212,7 +224,43 @@ class TestDruidCollector(unittest.TestCase):
                 'jetty/numOpenConnections': {
                     'metric_name': 'druid_coordinator_jetty_numOpenConnections',
                     'labels': None
-                },                
+                },
+                'ingest/kafka/lag': {
+                    'metric_name': 'druid_coordinator_ingest_kafka_lag',
+                    'labels': ['dataSource']
+                },
+                'ingest/kafka/maxLag': {
+                    'metric_name': 'druid_coordinator_ingest_kafka_maxLag',
+                    'labels': ['dataSource']
+                },
+                'ingest/kafka/avgLag': {
+                    'metric_name': 'druid_coordinator_ingest_kafka_avgLag',
+                    'labels': ['dataSource']
+                },
+                'task/success/count': {
+                    'metric_name': 'druid_coordinator_task_success_count',
+                    'labels': ['dataSource']
+                },
+                'task/failed/count': {
+                    'metric_name': 'druid_coordinator_task_failed_count',
+                    'labels': ['dataSource']
+                },
+                'task/running/count': {
+                    'metric_name': 'druid_coordinator_task_running_count',
+                    'labels': ['dataSource']
+                },
+                'task/pending/count': {
+                    'metric_name': 'druid_coordinator_task_pending_count',
+                    'labels': ['dataSource']
+                },
+                'task/waiting/count': {
+                    'metric_name': 'druid_coordinator_task_waiting_count',
+                    'labels': ['dataSource']
+                },
+                'compact/task/count': {
+                    'metric_name': 'druid_coordinator_compact_task_count',
+                    'labels': None
+                },
             },
             'peon': {
                 'query/time': {
@@ -307,7 +355,8 @@ class TestDruidCollector(unittest.TestCase):
             'druid_historical_segment_scan_pending',
             'druid_historical_max_segment_bytes',
             'druid_coordinator_segment_overshadowed_count',
-            'druid_coordinator_jetty_numOpenConnections',            
+            'druid_coordinator_jetty_numOpenConnections',
+            'druid_coordinator_compact_task_count',
             'druid_broker_query_cache_numentries_count',
             'druid_broker_query_cache_size_bytes',
             'druid_broker_query_cache_hits_count',
@@ -319,6 +368,7 @@ class TestDruidCollector(unittest.TestCase):
             'druid_broker_interrupted_query_count',
             'druid_broker_failed_query_count',
             'druid_broker_query_count',
+            'druid_broker_query_cache_hitRate',
             'druid_historical_query_cache_numentries_count',
             'druid_historical_query_cache_size_bytes',
             'druid_historical_query_cache_hits_count',
@@ -326,6 +376,7 @@ class TestDruidCollector(unittest.TestCase):
             'druid_historical_query_cache_evictions_count',
             'druid_historical_query_cache_timeouts_count',
             'druid_historical_query_cache_errors_count',
+            'druid_historical_query_cache_hitRate',
             'druid_historical_jetty_numOpenConnections',
             'druid_middlemanager_jetty_numOpenConnections',
             'druid_historical_success_query_count',
@@ -586,6 +637,14 @@ class TestDruidCollector(unittest.TestCase):
              "service": "druid/historical", "host": "druid1001.eqiad.wmnet:8082",
              "metric": "query/cache/total/errors", "value": 0},
 
+            {"feed": "metrics", "timestamp": "2017-11-14T16:25:39.217Z",
+             "service": "druid/historical", "host": "druid1001.eqiad.wmnet:8082",
+             "metric": "query/cache/total/hitRate", "value": .6},
+
+            {"feed": "metrics", "timestamp": "2017-11-14T16:25:39.217Z",
+             "service": "druid/broker", "host": "druid1001.eqiad.wmnet:8082",
+             "metric": "query/cache/total/hitRate", "value": .6},
+
             {"feed": "metrics", "timestamp": "2017-11-14T13:07:20.823Z",
              "service": "druid/historical", "host": "druid1001.eqiad.wmnet:8083",
              "metric": "segment/count", "value": 41, "dataSource": "netflow",
@@ -609,6 +668,10 @@ class TestDruidCollector(unittest.TestCase):
              "service": "druid/historical", "host": "druid1001.eqiad.wmnet:8083",
              "metric": "segment/scan/pending", "value": 0},
 
+            {"feed": "metrics", "timestamp": "2017-11-14T13:08:20.819Z",
+             "service": "druid/historical", "host": "druid1001.eqiad.wmnet:8083",
+             "metric": "segment/usedPercent", "value": 0.25, "tier": "_default_tier", "dataSource": "webrequest"},
+
             {"feed": "metrics", "timestamp": "2017-11-14T16:15:15.577Z",
              "service": "druid/coordinator",
              "host": "druid1001.eqiad.wmnet:8081", "metric": "segment/assigned/count",
@@ -619,6 +682,11 @@ class TestDruidCollector(unittest.TestCase):
              "service": "druid/coordinator", "host": "druid1001.eqiad.wmnet:8081",
              "metric": "segment/moved/count", "value": 0.0,
              "tier": "_default_tier"},
+
+            {"feed": "metrics",
+             "timestamp": "2017-11-14T16:19:46.564Z",
+             "service": "druid/coordinator", "host": "druid1001.eqiad.wmnet:8081",
+             "metric": "compact/task/count", "value": 0.0},
 
             {"feed": "metrics",
              "timestamp": "2017-11-14T16:19:46.564Z",
