@@ -127,7 +127,8 @@ class DruidCollector(object):
                 'ingest/persists/failed': ['dataSource'],
                 'ingest/handoff/failed': ['dataSource'],
                 'ingest/handoff/count': ['dataSource'],
-                'jetty/numOpenConnections': None,               
+                'jetty/numOpenConnections': None,
+                'segment/scan/pending': None,
             },
         }
 
