@@ -112,7 +112,8 @@ class DruidCollector(object):
                 'ingest/persists/failed': ['dataSource'],
                 'ingest/handoff/failed': ['dataSource'],
                 'ingest/handoff/count': ['dataSource'],
-                'jetty/numOpenConnections': ['dataSource'],            
+                'jetty/numOpenConnections': ['dataSource'],
+                'segment/scan/pending': None,
             },
             'middlemanager': {
                 'query/time': ['dataSource'],
@@ -251,6 +252,9 @@ class DruidCollector(object):
                'druid_middlemanager_jetty_numOpenConnections',
                'Number of open jetty connections.',
                labels=['datasource']),
+            'segment/scan/pending': GaugeMetricFamily(
+                'druid_peon_segment_scan_pending',
+                'Number of segments in queue waiting to be scanned.'),
         }
 
     def _get_query_histograms(self, daemon):
