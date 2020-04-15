@@ -25,7 +25,7 @@ log = logging.getLogger(__name__)
 
 class DruidCollector(object):
     scrape_duration = Summary(
-            'druid_scrape_duration_seconds', 'Druid scrape duration')
+        'druid_scrape_duration_seconds', 'Druid scrape duration')
 
     def __init__(self):
         # Datapoints successfully registered
@@ -79,24 +79,48 @@ class DruidCollector(object):
                 'segment/deleted/count': ['tier'],
                 'segment/unneeded/count': ['tier'],
                 'segment/overShadowed/count': None,
+                'segment/loadQueue/size': ['server'],
                 'segment/loadQueue/failed': ['server'],
                 'segment/loadQueue/count': ['server'],
                 'segment/dropQueue/count': ['server'],
                 'segment/size': ['dataSource'],
                 'segment/unavailable/count': ['dataSource'],
                 'segment/underReplicated/count': ['tier', 'dataSource'],
+                'tier/historical/count': ['tier'],
+                'tier/replication/factor': ['tier'],
+                'tier/required/capacity': ['tier'],
+                'tier/total/capacity': ['tier'],
+                'ingest/kafka/lag': ['dataSource'],
+                'ingest/kafka/maxLag': ['dataSource'],
+                'ingest/kafka/avgLag': ['dataSource'],
+                'task/success/count': ['dataSource'],
+                'task/failed/count': ['dataSource'],
+                'task/running/count': ['dataSource'],
+                'task/pending/count': ['dataSource'],
+                'task/waiting/count': ['dataSource'],
+                'task/run/time': ['dataSource'],
+                'task/action/log/time': ['dataSource'],
+                'task/action/run/time': ['dataSource'],
             },
-            'peon': {
+            'middlemanager': {
                 'query/time': ['dataSource'],
                 'query/bytes': ['dataSource'],
-                'ingest/events/thrownAway': ['dataSource'],
-                'ingest/events/unparseable': ['dataSource'],
-                'ingest/events/processed': ['dataSource'],
-                'ingest/rows/output': ['dataSource'],
-                'ingest/persists/count': ['dataSource'],
-                'ingest/persists/failed': ['dataSource'],
-                'ingest/handoff/failed': ['dataSource'],
-                'ingest/handoff/count': ['dataSource'],
+                'ingest/events/thrownAway': ['dataSource', 'taskId'],
+                'ingest/events/unparseable': ['dataSource', 'taskId'],
+                'ingest/events/duplicate': ['dataSource', 'taskId'],
+                'ingest/events/processed': ['dataSource', 'taskId'],
+                'ingest/rows/output': ['dataSource', 'taskId'],
+                'ingest/persists/count': ['dataSource', 'taskId'],
+                'ingest/persists/time': ['dataSource'],
+                'ingest/persists/cpu': ['dataSource'],
+                'ingest/persists/backPressure': ['dataSource'],
+                'ingest/persists/failed': ['dataSource', 'taskId'],
+                'ingest/handoff/failed': ['dataSource', 'taskId'],
+                'ingest/handoff/count': ['dataSource', 'taskId'],
+                'ingest/merge/time': ['dataSource'],
+                'ingest/merge/cpu': ['dataSource'],
+                'ingest/sink/count': ['dataSource', 'taskId'],
+                'ingest/events/messageGap': ['dataSource', 'taskId'],
             },
         }
 
@@ -106,6 +130,14 @@ class DruidCollector(object):
         self.metric_buckets = {
             'query/time': ['10', '100', '500', '1000', '2000', '3000', '5000', '7000', '10000', 'inf', 'sum'],
             'query/bytes': ['10', '100', '500', '1000', '2000', '3000', '5000', '7000', '10000', 'inf', 'sum'],
+            'ingest/persists/time': ['10', '100', '500', '1000', '2000', '3000', '5000', '7000', '10000', 'inf', 'sum'],
+            'ingest/persists/cpu': ['10', '100', '500', '1000', '2000', '3000', '5000', '7000', '10000', 'inf', 'sum'],
+            'ingest/persists/backPressure': ['10', '100', '500', '1000', '2000', '3000', '5000', '7000', '10000', 'inf', 'sum'],
+            'ingest/merge/time': ['10', '100', '500', '1000', '2000', '3000', '5000', '7000', '10000', 'inf', 'sum'],
+            'ingest/merge/cpu': ['10', '100', '500', '1000', '2000', '3000', '5000', '7000', '10000', 'inf', 'sum'],
+            'task/run/time': ['10', '100', '500', '1000', '2000', '3000', '5000', '7000', '10000', 'inf', 'sum'],
+            'task/action/log/time': ['10', '100', '500', '1000', '2000', '3000', '5000', '7000', '10000', 'inf', 'sum'],
+            'task/action/run/time': ['10', '100', '500', '1000', '2000', '3000', '5000', '7000', '10000', 'inf', 'sum'],
         }
 
         # Data structure holding histogram data
@@ -114,6 +146,14 @@ class DruidCollector(object):
         self.histograms_metrics = set([
             'query/time',
             'query/bytes',
+            'ingest/persists/time',
+            'ingest/persists/cpu',
+            'ingest/persists/backPressure',
+            'ingest/merge/time',
+            'ingest/merge/cpu',
+            'task/run/time',
+            'task/action/log/time',
+            'task/action/run/time',
         ])
 
         # Data structure holding counters data
@@ -145,20 +185,36 @@ class DruidCollector(object):
             'segment/deleted/count',
             'segment/unneeded/count',
             'segment/overShadowed/count',
+            'segment/loadQueue/size',
             'segment/loadQueue/failed',
             'segment/loadQueue/count',
             'segment/dropQueue/count',
             'segment/size',
             'segment/unavailable/count',
             'segment/underReplicated/count',
+            'tier/historical/count',
+            'tier/replication/factor',
+            'tier/required/capacity',
+            'tier/total/capacity',
+            'ingest/kafka/lag',
+            'ingest/kafka/maxLag',
+            'ingest/kafka/avgLag',
+            'task/success/count',
+            'task/failed/count',
+            'task/running/count',
+            'task/pending/count',
+            'task/waiting/count',
             'ingest/events/thrownAway',
             'ingest/events/unparseable',
+            'ingest/events/duplicate',
             'ingest/events/processed',
             'ingest/rows/output',
             'ingest/persists/count',
             'ingest/persists/failed',
             'ingest/handoff/failed',
             'ingest/handoff/count',
+            'ingest/sink/count',
+            'ingest/events/messageGap',
         ])
 
     @staticmethod
@@ -168,168 +224,282 @@ class DruidCollector(object):
     def _get_realtime_counters(self):
         return {
             'ingest/events/thrownAway': GaugeMetricFamily(
-               'druid_realtime_ingest_events_thrown_away_count',
-               'Number of events rejected because '
-               'they are outside the windowPeriod.',
-               labels=['datasource']),
+                'druid_realtime_ingest_events_thrown_away_count',
+                'Number of events rejected because '
+                'they are outside the windowPeriod.',
+                labels=['datasource', 'taskid']),
             'ingest/events/unparseable': GaugeMetricFamily(
-               'druid_realtime_ingest_events_unparseable_count',
-               'Number of events rejected because the events are unparseable.',
-               labels=['datasource']),
+                'druid_realtime_ingest_events_unparseable_count',
+                'Number of events rejected because the events are unparseable.',
+                labels=['datasource', 'taskid']),
+            'ingest/events/duplicate': GaugeMetricFamily(
+                'druid_realtime_ingest_events_duplicate_count',
+                'Number of events rejected because the events are duplicated.',
+                labels=['datasource', 'taskid']),
             'ingest/events/processed': GaugeMetricFamily(
-               'druid_realtime_ingest_events_processed_count',
-               'Number of events successfully processed per emission period.',
-               labels=['datasource']),
+                'druid_realtime_ingest_events_processed_count',
+                'Number of events successfully processed per emission period.',
+                labels=['datasource', 'taskid']),
             'ingest/rows/output': GaugeMetricFamily(
-               'druid_realtime_ingest_rows_output_count',
-               'Number of Druid rows persisted.',
-               labels=['datasource']),
+                'druid_realtime_ingest_rows_output_count',
+                'Number of Druid rows persisted.',
+                labels=['datasource', 'taskid']),
             'ingest/persists/count': GaugeMetricFamily(
-               'druid_realtime_ingest_persists_count',
-               'Number of times persist occurred.',
-               labels=['datasource']),
+                'druid_realtime_ingest_persists_count',
+                'Number of times persist occurred.',
+                labels=['datasource', 'taskid']),
             'ingest/persists/failed': GaugeMetricFamily(
-               'druid_realtime_ingest_persists_failed_count',
-               'Number of times persist failed.',
-               labels=['datasource']),
+                'druid_realtime_ingest_persists_failed_count',
+                'Number of times persist failed.',
+                labels=['datasource', 'taskid']),
             'ingest/handoff/failed': GaugeMetricFamily(
-               'druid_realtime_ingest_handoff_failed_count',
-               'Number of times handoff failed.',
-               labels=['datasource']),
+                'druid_realtime_ingest_handoff_failed_count',
+                'Number of times handoff failed.',
+                labels=['datasource', 'taskid']),
             'ingest/handoff/count': GaugeMetricFamily(
-               'druid_realtime_ingest_handoff_count',
-               'Number of times handoff has happened.',
-               labels=['datasource']),
+                'druid_realtime_ingest_handoff_count',
+                'Number of times handoff has happened.',
+                labels=['datasource', 'taskid']),
+            'ingest/sink/count': GaugeMetricFamily(
+                'druid_realtime_ingest_sink_count',
+                'Number of sinks not handoffed.',
+                labels=['datasource', 'taskid']),
+            'ingest/events/messageGap': GaugeMetricFamily(
+                'druid_realtime_ingest_events_messagegap',
+                'Time gap between the data time in event and current system time.',
+                labels=['datasource', 'taskid']),
         }
 
     def _get_query_histograms(self, daemon):
-        return {
-           'query/time': HistogramMetricFamily(
-               'druid_' + daemon + '_query_time_ms',
-               'Milliseconds taken to complete a query.',
-               labels=['datasource']),
-           'query/bytes': HistogramMetricFamily(
-               'druid_' + daemon + '_query_bytes',
-               'Number of bytes returned in query response.',
-               labels=['datasource']),
-        }
+        if daemon == 'middlemanager':
+            return {
+                'ingest/persists/time': HistogramMetricFamily(
+                    'druid_realtime_ingest_persists_time',
+                    'Milliseconds spent doing intermediate persist.',
+                    labels=['datasource']),
+                'ingest/persists/cpu': HistogramMetricFamily(
+                    'druid_realtime_ingest_persists_cpu',
+                    'Cpu time in Nanoseconds spent on doing intermediate persist.',
+                    labels=['datasource']),
+                'ingest/persists/backPressure': HistogramMetricFamily(
+                    'druid_realtime_ingest_persists_backpressure',
+                    'Milliseconds spent creating persist tasks and blocking waiting for them to finish.',
+                    labels=['datasource']),
+                'ingest/merge/time': HistogramMetricFamily(
+                    'druid_realtime_ingest_merge_time',
+                    'Milliseconds spent merging intermediate segments.',
+                    labels=['datasource']),
+                'ingest/merge/cpu': HistogramMetricFamily(
+                    'druid_realtime_ingest_merge_cpu',
+                    'Cpu time in Nanoseconds spent on merging intermediate segments.',
+                    labels=['datasource']),
+                'query/time': HistogramMetricFamily(
+                    'druid_' + daemon + '_query_time_ms',
+                    'Milliseconds taken to complete a query.',
+                    labels=['datasource']),
+                'query/bytes': HistogramMetricFamily(
+                    'druid_' + daemon + '_query_bytes',
+                    'Number of bytes returned in query response.',
+                    labels=['datasource']),
+            }
+        elif daemon == 'coordinator':
+            return {
+                'task/run/time': HistogramMetricFamily(
+                    'druid_coordinator_task_run_time',
+                    'Milliseconds taken to run a task.',
+                    labels=['datasource']),
+                'task/action/log/time': HistogramMetricFamily(
+                    'druid_coordinator_task_action_log_time',
+                    'Milliseconds taken to log a task action to the audit log.',
+                    labels=['datasource']),
+                'task/action/run/time': HistogramMetricFamily(
+                    'druid_coordinator_task_action_run_time',
+                    'Milliseconds taken to execute a task action.',
+                    labels=['datasource']),
+            }
+        else:
+            return {
+                'query/time': HistogramMetricFamily(
+                    'druid_' + daemon + '_query_time_ms',
+                    'Milliseconds taken to complete a query.',
+                    labels=['datasource']),
+                'query/bytes': HistogramMetricFamily(
+                    'druid_' + daemon + '_query_bytes',
+                    'Number of bytes returned in query response.',
+                    labels=['datasource']),
+            }
 
     def _get_cache_counters(self, daemon):
         return {
             'query/cache/total/numEntries': GaugeMetricFamily(
-               'druid_' + daemon + '_query_cache_numentries_count',
-               'Number of cache entries.'),
+                'druid_' + daemon + '_query_cache_numentries_count',
+                'Number of cache entries.'),
             'query/cache/total/sizeBytes': GaugeMetricFamily(
-               'druid_' + daemon + '_query_cache_size_bytes',
-               'Size in bytes of cache entries.'),
+                'druid_' + daemon + '_query_cache_size_bytes',
+                'Size in bytes of cache entries.'),
             'query/cache/total/hits': GaugeMetricFamily(
-               'druid_' + daemon + '_query_cache_hits_count',
-               'Number of cache hits.'),
+                'druid_' + daemon + '_query_cache_hits_count',
+                'Number of cache hits.'),
             'query/cache/total/misses': GaugeMetricFamily(
-               'druid_' + daemon + '_query_cache_misses_count',
-               'Number of cache misses.'),
+                'druid_' + daemon + '_query_cache_misses_count',
+                'Number of cache misses.'),
             'query/cache/total/evictions': GaugeMetricFamily(
-               'druid_' + daemon + '_query_cache_evictions_count',
-               'Number of cache evictions.'),
+                'druid_' + daemon + '_query_cache_evictions_count',
+                'Number of cache evictions.'),
             'query/cache/total/timeouts': GaugeMetricFamily(
-               'druid_' + daemon + '_query_cache_timeouts_count',
-               'Number of cache timeouts.'),
+                'druid_' + daemon + '_query_cache_timeouts_count',
+                'Number of cache timeouts.'),
             'query/cache/total/errors': GaugeMetricFamily(
-               'druid_' + daemon + '_query_cache_errors_count',
-               'Number of cache errors.'),
-            }
+                'druid_' + daemon + '_query_cache_errors_count',
+                'Number of cache errors.'),
+        }
     def _get_query_counters(self, daemon):
         return {
             'query/count': GaugeMetricFamily(
-               'druid_' + daemon + '_query_count',
-               'Number of queries'),
+                'druid_' + daemon + '_query_count',
+                'Number of queries'),
             'query/success/count': GaugeMetricFamily(
-               'druid_' + daemon + '_success_query_count',
-               'Number of Successfull queries'),
+                'druid_' + daemon + '_success_query_count',
+                'Number of Successfull queries'),
             'query/failed/count': GaugeMetricFamily(
-               'druid_' + daemon + '_failed_query_count',
-               'Number of failed queries'),
+                'druid_' + daemon + '_failed_query_count',
+                'Number of failed queries'),
             'query/interrupted/count': GaugeMetricFamily(
-               'druid_' + daemon + '_interrupted_query_count',
-               'Number of interrupted queries'),
-            }
+                'druid_' + daemon + '_interrupted_query_count',
+                'Number of interrupted queries'),
+        }
 
     def _get_historical_counters(self):
         return {
             'segment/max': GaugeMetricFamily(
-               'druid_historical_max_segment_bytes',
-               'Maximum byte limit available for segments.'),
+                'druid_historical_max_segment_bytes',
+                'Maximum byte limit available for segments.'),
             'segment/count': GaugeMetricFamily(
-               'druid_historical_segment_count',
-               'Number of served segments.',
-               labels=['tier', 'datasource']),
+                'druid_historical_segment_count',
+                'Number of served segments.',
+                labels=['tier', 'datasource']),
             'segment/used': GaugeMetricFamily(
-               'druid_historical_segment_used_bytes',
-               'Bytes used for served segments.',
-               labels=['tier', 'datasource']),
+                'druid_historical_segment_used_bytes',
+                'Bytes used for served segments.',
+                labels=['tier', 'datasource']),
             'segment/scan/pending': GaugeMetricFamily(
-               'druid_historical_segment_scan_pending',
-               'Number of segments in queue waiting to be scanned.'),
-            }
+                'druid_historical_segment_scan_pending',
+                'Number of segments in queue waiting to be scanned.'),
+        }
 
     def _get_coordinator_counters(self):
         return {
             'segment/assigned/count': GaugeMetricFamily(
-               'druid_coordinator_segment_assigned_count',
-               'Number of segments assigned to be loaded in the cluster.',
-               labels=['tier']),
+                'druid_coordinator_segment_assigned_count',
+                'Number of segments assigned to be loaded in the cluster.',
+                labels=['tier']),
             'segment/moved/count': GaugeMetricFamily(
-               'druid_coordinator_segment_moved_count',
-               'Number of segments assigned to be loaded in the cluster.',
-               labels=['tier']),
+                'druid_coordinator_segment_moved_count',
+                'Number of segments assigned to be loaded in the cluster.',
+                labels=['tier']),
             'segment/dropped/count': GaugeMetricFamily(
-               'druid_coordinator_segment_dropped_count',
-               'Number of segments dropped due to being overshadowed.',
-               labels=['tier']),
+                'druid_coordinator_segment_dropped_count',
+                'Number of segments dropped due to being overshadowed.',
+                labels=['tier']),
             'segment/deleted/count': GaugeMetricFamily(
-               'druid_coordinator_segment_deleted_count',
-               'Number of segments dropped due to rules.',
-               labels=['tier']),
+                'druid_coordinator_segment_deleted_count',
+                'Number of segments dropped due to rules.',
+                labels=['tier']),
             'segment/unneeded/count': GaugeMetricFamily(
-               'druid_coordinator_segment_unneeded_count',
-               'Number of segments dropped due to being marked as unused.',
-               labels=['tier']),
+                'druid_coordinator_segment_unneeded_count',
+                'Number of segments dropped due to being marked as unused.',
+                labels=['tier']),
             'segment/overShadowed/count': GaugeMetricFamily(
-               'druid_coordinator_segment_overshadowed_count',
-               'Number of overShadowed segments.'),
+                'druid_coordinator_segment_overshadowed_count',
+                'Number of overShadowed segments.'),
+            'segment/loadQueue/size': GaugeMetricFamily(
+                'druid_coordinator_segment_loadqueue_size_bytes',
+                'Size in bytes of segments to load.',
+                labels=['server']),
             'segment/loadQueue/failed': GaugeMetricFamily(
-               'druid_coordinator_segment_loadqueue_failed_count',
-               'Number of segments that failed to load.',
-               labels=['server']),
+                'druid_coordinator_segment_loadqueue_failed_count',
+                'Number of segments that failed to load.',
+                labels=['server']),
             'segment/loadQueue/count': GaugeMetricFamily(
-               'druid_coordinator_segment_loadqueue_count',
-               'Number of segments to load.',
-               labels=['server']),
+                'druid_coordinator_segment_loadqueue_count',
+                'Number of segments to load.',
+                labels=['server']),
             'segment/dropQueue/count': GaugeMetricFamily(
-               'druid_coordinator_segment_dropqueue_count',
-               'Number of segments to drop.',
-               labels=['server']),
+                'druid_coordinator_segment_dropqueue_count',
+                'Number of segments to drop.',
+                labels=['server']),
             'segment/size': GaugeMetricFamily(
-               'druid_coordinator_segment_size_bytes',
-               'Size in bytes of available segments.',
-               labels=['datasource']),
+                'druid_coordinator_segment_size_bytes',
+                'Size in bytes of available segments.',
+                labels=['datasource']),
             'segment/count': GaugeMetricFamily(
-               'druid_coordinator_segment_count',
-               'Number of served segments.',
-               labels=['datasource']),
+                'druid_coordinator_segment_count',
+                'Number of served segments.',
+                labels=['datasource']),
             'segment/unavailable/count': GaugeMetricFamily(
-               'druid_coordinator_segment_unavailable_count',
-               'Number of segments (not including replicas) left to load '
-               'until segments that should be loaded in the cluster '
-               'are available for queries.',
-               labels=['datasource']),
+                'druid_coordinator_segment_unavailable_count',
+                'Number of segments (not including replicas) left to load '
+                'until segments that should be loaded in the cluster '
+                'are available for queries.',
+                labels=['datasource']),
             'segment/underReplicated/count': GaugeMetricFamily(
-               'druid_coordinator_segment_under_replicated_count',
-               'Number of segments (including replicas) left to load until '
-               'segments that should be loaded in the cluster are '
-               'available for queries.',
-               labels=['tier', 'datasource']),
-            }
+                'druid_coordinator_segment_under_replicated_count',
+                'Number of segments (including replicas) left to load until '
+                'segments that should be loaded in the cluster are '
+                'available for queries.',
+                labels=['tier', 'datasource']),
+            'tier/historical/count': GaugeMetricFamily(
+                'druid_coordinator_tier_historical_count',
+                'Number of available historical nodes in each tier.',
+                labels=['tier']),
+            'tier/replication/factor': GaugeMetricFamily(
+                'druid_coordinator_tier_replication_count',
+                'Configured maximum replication factor in each tier.',
+                labels=['tier']),
+            'tier/required/capacity': GaugeMetricFamily(
+                'druid_coordinator_tier_required_capacity_bytes',
+                'Total capacity in bytes required in each tier.',
+                labels=['tier']),
+            'tier/total/capacity': GaugeMetricFamily(
+                'druid_coordinator_tier_total_capacity_bytes',
+                'Total capacity in bytes available in each tier.',
+                labels=['tier']),
+            'ingest/kafka/lag': GaugeMetricFamily(
+                'druid_realtime_ingest_kafka_lag',
+                'Total lag between the offsets consumed by the Kafka indexing tasks'
+                'and latest offsets in Kafka brokers across all partitions.',
+                labels=['datasource']),
+            'ingest/kafka/maxLag': GaugeMetricFamily(
+                'druid_realtime_ingest_kafka_maxlag',
+                'Max lag between the offsets consumed by the Kafka indexing tasks'
+                'and latest offsets in Kafka brokers across all partitions.',
+                labels=['datasource']),
+            'ingest/kafka/avgLag': GaugeMetricFamily(
+                'druid_realtime_ingest_kafka_avglag',
+                'Average lag between the offsets consumed by the Kafka indexing tasks'
+                'and latest offsets in Kafka brokers across all partitions.',
+                labels=['datasource']),
+            'task/success/count': GaugeMetricFamily(
+                'druid_coordinator_task_success_count',
+                'Number of successful tasks per emission period.',
+                labels=['datasource']),
+            'task/failed/count': GaugeMetricFamily(
+                'druid_coordinator_task_failed_count',
+                'Number of failed tasks per emission period.',
+                labels=['datasource']),
+            'task/running/count': GaugeMetricFamily(
+                'druid_coordinator_task_running_count',
+                'Number of current running tasks.',
+                labels=['datasource']),
+            'task/pending/count': GaugeMetricFamily(
+                'druid_coordinator_task_pending_count',
+                'Number of current pending tasks.',
+                labels=['datasource']),
+            'task/waiting/count': GaugeMetricFamily(
+                'druid_coordinator_task_waiting_count',
+                'Number of current waiting tasks.',
+                labels=['datasource']),
+        }
 
     def store_counter(self, datapoint):
         """ This function adds data to the self.counters dictiorary following its
@@ -395,7 +565,7 @@ class DruidCollector(object):
             if bucket not in stored_buckets:
                 stored_buckets[bucket] = 0
             if bucket != 'sum' and metric_value <= float(bucket):
-                    stored_buckets[bucket] += 1
+                stored_buckets[bucket] += 1
         stored_buckets['sum'] += metric_value
 
         log.debug("The datapoint {} modified the histograms dictionary to: \n{}"
@@ -403,8 +573,8 @@ class DruidCollector(object):
 
     @scrape_duration.time()
     def collect(self):
-        # Metrics common to Broker, Historical and Peon
-        for daemon in ['broker', 'historical', 'peon']:
+        # Metrics common to Broker, Historical and MiddleManager
+        for daemon in ['broker', 'historical', 'middlemanager']:
             query_metrics = self._get_query_histograms(daemon)
             cache_metrics = self._get_cache_counters(daemon)
 
@@ -452,7 +622,7 @@ class DruidCollector(object):
         realtime_metrics = self._get_realtime_counters()
         for daemon, metrics in [('coordinator', coordinator_metrics),
                                 ('historical', historical_health_metrics),
-                                ('peon', realtime_metrics)]:
+                                ('middlemanager', realtime_metrics)]:
             for metric in metrics:
                 if not self.counters[metric] or daemon not in self.counters[metric]:
                     if not self.supported_metric_names[daemon][metric]:
