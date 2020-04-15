@@ -46,6 +46,20 @@ This exporter is supposed to be run on each host running a Druid daemon.
 * `query/cache/total/timeouts`
 * `query/cache/total/errors`
 
+### Coordinator (histograms)
+* `task/run/time` [dataSource]
+* `task/action/log/time` [dataSource]
+* `task/action/run/time` [dataSource]
+
+### MiddleManager (histograms)
+* `query/time` [dataSource]
+* `query/bytes` [dataSource]
+* `ingest/persists/time` [dataSource]
+* `ingest/persists/cpu` [dataSource]
+* `ingest/persists/backPressure` [dataSource]
+* `ingest/merge/time` [dataSource]
+* `ingest/merge/cpu` [dataSource]
+
 ### Historical, Coordinator (counters)
 * `segment/max` [datasource]
 * `segment/count` [datasource]
@@ -65,24 +79,40 @@ This exporter is supposed to be run on each host running a Druid daemon.
 * `segment/deleted/count` [tier]
 * `segment/unneeded/count` [tier]
 * `segment/overShadowed/count`
+* `segment/loadQueue/size` [server]
 * `segment/loadQueue/failed` [server]
 * `segment/loadQueue/count` [server]
 * `segment/dropQueue/count` [server]
 * `segment/size` [datasource]
 * `segment/unavailable/count` [datasource]
 * `segment/underReplicated/count` [datasource, tier]
+* `tier/historical/count` [tier]
+* `tier/replication/factor` [tier]
+* `tier/required/capacity` [tier]
+* `tier/total/capacity` [tier]
+* `ingest/kafka/lag` [datasource]
+* `ingest/kafka/maxLag` [datasource]
+* `ingest/kafka/avgLag` [datasource]
+* `task/success/count` [datasource]
+* `task/failed/count` [datasource]
+* `task/running/count` [datasource]
+* `task/pending/count` [datasource]
+* `task/waiting/count` [datasource]
 
-### Peon (counters)
+### MiddleManager (counters)
 * `query/time` [datasource]
 * `query/bytes` [datasource]
-* `ingest/events/thrownAway` [dataSource]
-* `ingest/events/unparseable` [dataSource]
-* `ingest/events/processed` [dataSource]
-* `ingest/rows/output` [dataSource]
-* `ingest/persists/count` [dataSource]
-* `ingest/persists/failed` [dataSource]
-* `ingest/handoff/failed` [dataSource]
-* `ingest/handoff/count` [dataSource]
+* `ingest/events/thrownAway` [datasource, taskid]
+* `ingest/events/unparseable` [datasource, taskid]
+* `ingest/events/duplicate` [datasource, taskid]
+* `ingest/events/processed` [datasource, taskid]
+* `ingest/rows/output` [datasource, taskid]
+* `ingest/persists/count` [datasource, taskid]
+* `ingest/persists/failed` [datadatasource, taskidSource]
+* `ingest/handoff/failed` [datdatasource, taskidaSource]
+* `ingest/handoff/count` [datasource, taskid]
+* `ingest/sink/count` [datadatasource, taskidSource]
+* `ingest/events/messageGap` [datdatasource, taskidaSource]
 
 Realtime metrics have been tested only when emitted by Peons, since the Wikimedia
 use case (for the moment) is to use [Tranquillity](https://github.com/druid-io/tranquility)
