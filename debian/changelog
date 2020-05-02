@@ -1,3 +1,10 @@
+prometheus-druid-exporter (0.8-1) unstable; urgency=low
+
+  * Upgrade to upstream version 0.8.
+  * Require a more recent version of python3-python-client.
+
+ -- Luca Toscano <ltoscano@wikimedia.org>  Sat, 02 May 2020 10:53:36 +0000
+
 prometheus-druid-exporter (0.6-1) unstable; urgency=low
 
   * Allow a metric to be emitted by multiple daemons,
