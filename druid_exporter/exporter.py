@@ -60,8 +60,60 @@ class DruidWSGIApp(object):
         return ''
 
 
+def check_metrics_config_file_consistency(json_config):
+    if not json_config:
+        raise RuntimeError('Validation error: empty config file.')
+    # The first level of nesting should be related to Druid daemon names
+    druid_daemon_names = [
+        'middlemanager', 'historical', 'peon', 'broker', 'coordinator']
+    required_config_fields = [
+        'prometheus_metric_name', 'labels', 'type', 'description'
+    ]
+    allowed_metric_types = ['histogram', 'counter', 'gauge']
+    for daemon in json_config.keys():
+        if daemon not in druid_daemon_names:
+            raise RuntimeError(
+                'Config error: daemon name {} not among the list '
+                'of allowed Druid daemons {}.'
+                .format(daemon, druid_daemon_names))
+        for druid_metric_name in json_config[daemon]:
+            metric_metadata = json_config[daemon][druid_metric_name]
+            for required_field in required_config_fields:
+                if required_field not in metric_metadata.keys():
+                    raise RuntimeError(
+                        'Config error: metric {} for daemon {} '
+                        'misses the required field {}.'
+                        .format(druid_metric_name, daemon, required_field))
+            if metric_metadata['type'] not in allowed_metric_types:
+                raise RuntimeError(
+                    'Config error: metric {} for daemon {} has type {}, '
+                    'that is not supported. Please use one of {}.'
+                    .format(druid_metric_name, daemon,
+                            metric_metadata['type'], allowed_metric_type))
+            if metric_metadata['type'] == 'histogram' and \
+                    'buckets' not in metric_metadata.keys():
+                raise RuntimeError(
+                    'Config error: metric {} for daemon {} has type {}, '
+                    'but no "buckets" field. Please add it to the config.'
+                    .format(druid_metric_name, daemon, metric_metadata['type']))
+
+
+def parse_metrics_config_file(path):
+    with open(path, 'r') as f:
+        try:
+            parsed_json = json.load(f)
+        except json.JSONDecodeError as e:
+            log.exception(
+                'Failed to decode the JSON metric config file '
+                'in {}, please check the error reported.'.format(path))
+            return {}
+        return parsed_json
+
+
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument('config_file',
+                        help='Config file with the list of metrics to collect/export')
     parser.add_argument('-l', '--listen', metavar='ADDRESS',
                         help='Listen on this address', default=':8000')
     parser.add_argument('-u', '--uri', default='/',
@@ -81,8 +133,17 @@ def main():
 
     address, port = args.listen.split(':', 1)
     log.info('Starting druid_exporter on %s:%s', address, port)
+    log.info('Reading metrics configuration from {}'.format(args.config_file))
 
-    druid_collector = collector.DruidCollector()
+    metrics_config = parse_metrics_config_file(args.config_file)
+    if metrics_config == {}:
+        log.error('Failed to load metrics config file, aborting.')
+        return 1
+
+    log.info('Checking consistency of metrics config file..')
+    check_metrics_config_file_consistency(metrics_config)
+
+    druid_collector = collector.DruidCollector(metrics_config)
     REGISTRY.register(druid_collector)
     prometheus_app = make_wsgi_app()
     druid_wsgi_app = DruidWSGIApp(args.uri, druid_collector,
