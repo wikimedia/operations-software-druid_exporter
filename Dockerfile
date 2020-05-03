@@ -1,5 +1,6 @@
 FROM python:3.8-alpine
 
+COPY conf/ /exporter/conf/
 COPY druid_exporter/ /exporter/druid_exporter/
 COPY setup.py /exporter/setup.py
 
