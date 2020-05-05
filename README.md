@@ -15,6 +15,30 @@ The easiest way to run `druid_exporter` is via a virtualenv:
 
 By default metrics are exposed on TCP port `8000`. Python 2 is not supported.
 
+### Running with Docker
+
+Issue the following command to build the image. Default base image (python:3.8-alpine) can be replaced.
+```bash
+docker build -t druid-exporter:latest .
+docker build -t druid-exporter:latest --build-arg BASE_IMAGE=<python-image> .
+```
+
+Issue the following command to run.
+```bash
+docker run -it -d -p 8000:8000 druid-exporter:latest conf/example_druid_0_12_3.json
+```
+
+Example `docker-compose.yml`:
+```yaml
+druid-exporter:
+  image: "druid-exporter:latest"
+  command: 
+    - "conf/example_druid_0_12_3.json"
+  ports:
+    - published: 8000
+      target: 8000
+```
+
 ## Druid versions supported
 
 This exporter is tested and used by the Wikimedia foundation with Druid version 0.12.3,
