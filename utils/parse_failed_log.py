@@ -124,17 +124,18 @@ for line in sys.stdin:
     else:
         output_json[metric_name]["description"] = "druid_{0}".format(metric_name.replace('/','_'))
     
-    if 'dataSource' in parsed_json.keys():
-        print("Found dataSource. Adding it as label for prometheus.")
-        output_json[metric_name]['labels'] = "dataSource"
-    elif 'memKind' in parsed_json.keys():
-        print("Found memKind. Adding it as label for prometheus.")
-        output_json[metric_name]['labels'] = "memKind"
-    elif 'bufferpoolName' in parsed_json.keys():
-        print("Found bufferpoolName. Adding it as label for prometheus.")
-        output_json[metric_name]['labels'] = "bufferpoolName"
-    else:
-         output_json[metric_name]['labels'] = '[]'
+    
+    # Some heuristic to guess the labels
+    possible_labels = ["dataSource", "memKind", "bufferpoolName"]
+    labels = "[]" # By default it needs the field label even with an empty list.
+
+    for possible_label in possible_labels:
+        if possible_label in parsed_json.keys():
+            print("Adding {0} it as label for prometheus.".format(possible_label))
+            labels = possible_label
+    
+    output_json[metric_name]['labels'] = labels
+
     
     # Some light heuristic to guess the type.
     if re.search("/time$|/bytes$|/cpu$", parsed_json['metric']):
