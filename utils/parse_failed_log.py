@@ -127,10 +127,10 @@ for line in sys.stdin:
     if 'dataSource' in parsed_json.keys():
         print("Found dataSource. Adding it as label for prometheus.")
         output_json[metric_name]['labels'] = "dataSource"
-    if 'memKind' in parsed_json.keys():
+    elif 'memKind' in parsed_json.keys():
         print("Found memKind. Adding it as label for prometheus.")
         output_json[metric_name]['labels'] = "memKind"
-    if 'bufferpoolName' in parsed_json.keys():
+    elif 'bufferpoolName' in parsed_json.keys():
         print("Found bufferpoolName. Adding it as label for prometheus.")
         output_json[metric_name]['labels'] = "bufferpoolName"
     else:
