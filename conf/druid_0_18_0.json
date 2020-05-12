@@ -22,61 +22,73 @@
         "jvm/mem/committed": {
             "description": "Committed memory", 
             "prometheus_metric_name": "druid_jvm_mem_committed", 
+            "labels": "[]", 
             "type": "gauge"
         },
         "jvm/mem/used": {
             "description": "Used memory", 
             "prometheus_metric_name": "druid_jvm_mem_used", 
+            "labels": "[]", 
             "type": "gauge"
         },
         "jvm/mem/init": {
             "description": "Initial memory", 
             "prometheus_metric_name": "druid_jvm_mem_init", 
+            "labels": "[]", 
             "type": "gauge"
         },
         "jvm/mem/max": {
             "description": "Max memory", 
             "prometheus_metric_name": "druid_jvm_mem_max", 
+            "labels": "[]", 
             "type": "gauge"
         },
         "jvm/pool/max": {
             "description": "Max pool", 
             "prometheus_metric_name": "druid_jvm_pool_max", 
+            "labels": "[]", 
             "type": "gauge"
         },
         "jvm/pool/committed": {
             "description": "Committed pool", 
             "prometheus_metric_name": "druid_jvm_pool_committed", 
+            "labels": "[]", 
             "type": "gauge"
         },
         "jvm/pool/used": {
             "description": "Pool used", 
             "prometheus_metric_name": "druid_jvm_pool_used", 
+            "labels": "[]", 
             "type": "gauge"
         },
         "jvm/pool/init": {
             "description": "Initial pool", 
             "prometheus_metric_name": "druid_jvm_pool_init", 
+            "labels": "[]", 
             "type": "gauge"
         },
         "jvm/bufferpool/capacity": {
             "description": "Bufferpool capacity", 
             "prometheus_metric_name": "druid_jvm_bufferpool_capacity", 
+            "labels": "[]", 
             "type": "gauge"
         },
         "jvm/bufferpool/used": {
             "description": "Bufferpool used", 
             "prometheus_metric_name": "druid_jvm_bufferpool_used", 
+            "labels": "[]", 
             "type": "gauge"
         },
         "jvm/bufferpool/count": {
             "description": "Bufferpool count", 
             "prometheus_metric_name": "druid_jvm_bufferpool_count", 
+            "labels": "[]", 
             "type": "gauge"
         },
         "jvm/gc/count": {
             "description": "Garbage collection count", 
             "prometheus_metric_name": "druid_jvm_gc_count", 
+            "labels": "[]", 
             "type": "gauge"
         },
         "jvm/gc/cpu": {
@@ -95,26 +107,31 @@
             ], 
             "description": "Count of CPU time in Nanoseconds spent on garbage collection Note: jvm/gc/cpu represents the total time over multiple GC cycles; divide by jvm/gc/count to get the mean GC time per cycle", 
             "prometheus_metric_name": "druid_jvm_gc_cpu", 
+            "labels": "[]", 
             "type": "histogram"
         },
         "jvm/gc/mem/max": {
             "description": "druid_jvm_gc_mem_max", 
             "prometheus_metric_name": "druid_jvm_gc_mem_max", 
+            "labels": "[]", 
             "type": "gauge"
         },
         "jvm/gc/mem/capacity": {
             "description": "druid_jvm_gc_mem_capacity", 
             "prometheus_metric_name": "druid_jvm_gc_mem_capacity", 
+            "labels": "[]", 
             "type": "gauge"
         },
         "jvm/gc/mem/used": {
             "description": "druid_jvm_gc_mem_used", 
             "prometheus_metric_name": "druid_jvm_gc_mem_used", 
+            "labels": "[]", 
             "type": "gauge"
         },
         "jvm/gc/mem/init": {
             "description": "druid_jvm_gc_mem_init", 
             "prometheus_metric_name": "druid_jvm_gc_mem_init", 
+            "labels": "[]", 
             "type": "gauge"
         }
     },
