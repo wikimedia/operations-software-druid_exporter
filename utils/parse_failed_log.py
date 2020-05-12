@@ -75,6 +75,17 @@ def load_descriptions():
             print("No match")
     return desc_dict
 
+def is_processed(service, metric):
+    if service not in processed_metrics:
+        processed_metrics[service] = []
+        processed_metrics[service].append(metric)
+        return False
+    if metric not in processed_metrics[service]:
+        processed_metrics[service].append(metric)
+        return False
+
+    return True
+
 
 p = re.compile("DEBUG:druid_exporter.collector:The following datapoint is not supported, either because the 'feed' field is not 'metrics' or the metric itself is not supported: (.*)")
 
@@ -82,6 +93,7 @@ p = re.compile("DEBUG:druid_exporter.collector:The following datapoint is not su
 descriptions = load_descriptions()
 # print(descriptions)
 
+processed_metrics = {}
 
 for line in sys.stdin:
     unsupported_metric = p.search(line)
@@ -90,6 +102,10 @@ for line in sys.stdin:
         metric = unsupported_metric.group(1)
         parsed_json = json.loads(metric.replace("'", '"'))
         # print("found: {0}".format(unsupported_metric.group(1)))
+        
+        if is_processed(parsed_json['service'], parsed_json['metric']):
+            continue
+
         print("\n\n----------------")
         print("Found metric: ")
         print(json.dumps(parsed_json, indent=4, sort_keys=True))
