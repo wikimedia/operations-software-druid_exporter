@@ -1,0 +1,78 @@
+query/time	Milliseconds taken to complete a query.
+query/bytes	number of bytes returned in query response.
+query/node/time	Milliseconds taken to query individual historical/realtime processes.
+query/node/bytes	number of bytes returned from querying individual historical/realtime processes.
+query/node/ttfb	Time to first byte. Milliseconds elapsed until Broker starts receiving the response from individual historical/realtime processes.
+query/node/backpressure	Milliseconds that the channel to this process has spent suspended due to backpressure.
+query/count	number of total queries
+query/success/count	number of queries successfully processed
+query/failed/count	number of failed queries
+query/interrupted/count	number of queries interrupted due to cancellation or timeout
+sqlQuery/time	Milliseconds taken to complete a SQL query.
+sqlQuery/bytes	number of bytes returned in SQL query response.
+	
+query/time	Milliseconds taken to complete a query.
+query/segment/time	Milliseconds taken to query individual segment. Includes time to page in the segment from disk.
+query/wait/time	Milliseconds spent waiting for a segment to be scanned.
+segment/scan/pending	Number of segments in queue waiting to be scanned.
+query/segmentAndCache/time	Milliseconds taken to query individual segment or hit the cache (if it is enabled on the Historical process).
+query/cpu/time	Microseconds of CPU time taken to complete a query
+query/count	number of total queries
+query/success/count	number of queries successfully processed
+query/failed/count	number of failed queries
+query/interrupted/count	number of queries interrupted due to cancellation or timeout
+	
+query/time	Milliseconds taken to complete a query.
+query/wait/time	Milliseconds spent waiting for a segment to be scanned.
+segment/scan/pending	Number of segments in queue waiting to be scanned.
+query/count	number of total queries
+query/success/count	number of queries successfully processed
+query/failed/count	number of failed queries
+query/interrupted/count	number of queries interrupted due to cancellation or timeout
+	
+jetty/numOpenConnections	Number of open jetty connections.
+	
+sqlQuery/time	Milliseconds taken to complete a SQL.
+sqlQuery/bytes	number of bytes returned in SQL response.
+	
+segment/assigned/count	Number of segments assigned to be loaded in the cluster.
+segment/moved/count	Number of segments moved in the cluster.
+segment/dropped/count	Number of segments dropped due to being overshadowed.
+segment/deleted/count	Number of segments dropped due to rules.
+segment/unneeded/count	Number of segments dropped due to being marked as unused.
+segment/cost/raw	Used in cost balancing. The raw cost of hosting segments.
+segment/cost/normalization	Used in cost balancing. The normalization of hosting segments.
+segment/cost/normalized	Used in cost balancing. The normalized cost of hosting segments.
+segment/loadQueue/size	Size in bytes of segments to load.
+segment/loadQueue/failed	Number of segments that failed to load.
+segment/loadQueue/count	Number of segments to load.
+segment/dropQueue/count	Number of segments to drop.
+segment/size	Total size of used segments in a data source. Emitted only for data sources to which at least one used segment belongs.
+segment/count	Number of used segments belonging to a data source. Emitted only for data sources to which at least one used segment belongs.
+segment/overShadowed/count	Number of overshadowed segments.
+segment/unavailable/count	Number of segments (not including replicas) left to load until segments that should be loaded in the cluster are available for queries.
+segment/underReplicated/count	Number of segments (including replicas) left to load until segments that should be loaded in the cluster are available for queries.
+tier/historical/count	Number of available historical nodes in each tier.
+tier/replication/factor	Configured maximum replication factor in each tier.
+tier/required/capacity	Total capacity in bytes required in each tier.
+tier/total/capacity	Total capacity in bytes available in each tier.
+	
+segment/max	Maximum byte limit available for segments.
+segment/used	Bytes used for served segments.
+segment/usedPercent	Percentage of space used by served segments.
+segment/count	Number of served segments.
+segment/pendingDelete	On-disk size in bytes of segments that are waiting to be cleared out
+	
+jvm/pool/committed	Committed pool.
+jvm/pool/init	Initial pool.
+jvm/pool/max	Max pool.
+jvm/pool/used	Pool used.
+jvm/bufferpool/count	Bufferpool count.
+jvm/bufferpool/used	Bufferpool used.
+jvm/bufferpool/capacity	Bufferpool capacity.
+jvm/mem/init	Initial memory.
+jvm/mem/max	Max memory.
+jvm/mem/used	Used memory.
+jvm/mem/committed	Committed memory.
+jvm/gc/count	Garbage collection count.
+jvm/gc/cpu	Count of CPU time in Nanoseconds spent on garbage collection. Note: jvm/gc/cpu represents the total time over multiple GC cycles; divide by jvm/gc/count to get the mean GC time per cycle
