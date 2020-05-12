@@ -179,6 +179,44 @@
             ],
             "description": "Number of bytes returned in query response."
         },
+        "sqlQuery/time": {
+            "buckets": [
+                "10", 
+                "100", 
+                "500", 
+                "1000", 
+                "2000", 
+                "3000", 
+                "5000", 
+                "7000", 
+                "10000", 
+                "inf", 
+                "sum"
+            ], 
+            "description": "Milliseconds taken to complete a SQL.", 
+            "labels": "dataSource", 
+            "prometheus_metric_name": "druid_sqlQuery_time", 
+            "type": "histogram"
+        },
+        "sqlQuery/bytes": {
+            "buckets": [
+                "10", 
+                "100", 
+                "500", 
+                "1000", 
+                "2000", 
+                "3000", 
+                "5000", 
+                "7000", 
+                "10000", 
+                "inf", 
+                "sum"
+            ], 
+            "description": "number of bytes returned in SQL response.", 
+            "labels": "dataSource", 
+            "prometheus_metric_name": "druid_sqlQuery_bytes", 
+            "type": "histogram"
+        },    
         "query/cache/total/numEntries": {
             "prometheus_metric_name": "druid_broker_query_cache_numentries_count",
             "type": "gauge",
