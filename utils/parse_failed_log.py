@@ -125,8 +125,14 @@ for line in sys.stdin:
         output_json[metric_name]["description"] = "druid_{0}".format(metric_name.replace('/','_'))
     
     if 'dataSource' in parsed_json.keys():
-        print("It maybe a dataSource Dimmension. Adding it as label for prometheus.")
+        print("Found dataSource. Adding it as label for prometheus.")
         output_json[metric_name]['labels'] = "dataSource"
+    if 'memKind' in parsed_json.keys():
+        print("Found memKind. Adding it as label for prometheus.")
+        output_json[metric_name]['labels'] = "memKind"
+    if 'bufferpoolName' in parsed_json.keys():
+        print("Found bufferpoolName. Adding it as label for prometheus.")
+        output_json[metric_name]['labels'] = "bufferpoolName"
     else:
          output_json[metric_name]['labels'] = '[]'
     
