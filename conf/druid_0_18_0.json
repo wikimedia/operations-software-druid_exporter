@@ -216,7 +216,19 @@
             "labels": "dataSource", 
             "prometheus_metric_name": "druid_sqlQuery_bytes", 
             "type": "histogram"
-        },    
+        },
+        "namespace/cache/numEntries": {
+            "description": "druid_namespace_cache_numEntries", 
+            "labels": "[]", 
+            "prometheus_metric_name": "druid_namespace_cache_numEntries", 
+            "type": "gauge"
+        },
+        "namespace/deltaTasksStarted": {
+            "description": "druid_namespace_deltaTasksStarted", 
+            "labels": "[]", 
+            "prometheus_metric_name": "druid_namespace_deltaTasksStarted", 
+            "type": "gauge"
+        },
         "query/cache/total/numEntries": {
             "prometheus_metric_name": "druid_broker_query_cache_numentries_count",
             "type": "gauge",
