@@ -57,8 +57,6 @@ def load_descriptions():
         if (desc_match):
             # print("Match")
             desc_dict[desc_match.group(1)] = desc_match.group(2)
-        else:
-            print("No match")
     return desc_dict
 
 def is_processed(service, metric):
@@ -117,7 +115,7 @@ for line in sys.stdin:
 
     for possible_label in possible_labels:
         if possible_label in parsed_json.keys():
-            print("Adding {0} it as label for prometheus.".format(possible_label))
+            print("Adding {0} as label for prometheus.".format(possible_label))
             output_json[metric_name]['labels'].append(possible_label)
 
     
