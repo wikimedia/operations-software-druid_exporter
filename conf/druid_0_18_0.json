@@ -1,5 +1,24 @@
 {
     "router": {
+        "jvm/heapAlloc/bytes": {
+            "buckets": [
+                "10", 
+                "100", 
+                "500", 
+                "1000", 
+                "2000", 
+                "3000", 
+                "5000", 
+                "7000", 
+                "10000", 
+                "inf", 
+                "sum"
+            ], 
+            "description": "druid_jvm_heapAlloc_bytes", 
+            "labels": "[]", 
+            "prometheus_metric_name": "druid_jvm_heapAlloc_bytes", 
+            "type": "histogram"
+        },    
         "jetty/numOpenConnections": {
             "description": "Number of open jetty connections.", 
             "labels": "[]", 
@@ -142,6 +161,24 @@
         }
     },
     "broker": {
+        "namespace/cache/heapSizeInBytes": {
+            "description": "druid_namespace_cache_heapSizeInBytes", 
+            "labels": "[]", 
+            "prometheus_metric_name": "druid_namespace_cache_heapSizeInBytes", 
+            "type": "gauge"
+        },
+        "jvm/gc/mem/init": {
+            "description": "druid_jvm_gc_mem_init", 
+            "labels": "[]", 
+            "prometheus_metric_name": "druid_jvm_gc_mem_init", 
+            "type": "gauge"
+        },
+        "jvm/gc/mem/capacity": {
+            "description": "druid_jvm_gc_mem_capacity", 
+            "labels": "[]", 
+            "prometheus_metric_name": "druid_jvm_gc_mem_capacity", 
+            "type": "gauge"
+        },
         "jvm/gc/mem/max": {
             "description": "druid_jvm_gc_mem_max", 
             "labels": "[]", 
