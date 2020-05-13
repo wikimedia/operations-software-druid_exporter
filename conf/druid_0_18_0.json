@@ -554,6 +554,223 @@
         }
     },
     "historical": {
+        "jvm/heapAlloc/bytes": {
+            "buckets": [
+                "10", 
+                "100", 
+                "500", 
+                "1000", 
+                "2000", 
+                "3000", 
+                "5000", 
+                "7000", 
+                "10000", 
+                "inf", 
+                "sum"
+            ], 
+            "description": "druid_jvm_heapAlloc_bytes", 
+            "labels": "[]", 
+            "prometheus_metric_name": "druid_jvm_heapAlloc_bytes", 
+            "type": "histogram"
+        },
+        "jvm/gc/mem/init": {
+            "description": "druid_jvm_gc_mem_init",
+            "labels": [],
+            "prometheus_metric_name": "druid_jvm_gc_mem_init",
+            "type": "gauge"
+        },
+        "jvm/gc/mem/used": {
+            "description": "druid_jvm_gc_mem_used",
+            "labels": [],
+            "prometheus_metric_name": "druid_jvm_gc_mem_used",
+            "type": "gauge"
+        },
+        "jvm/gc/mem/capacity": {
+            "description": "druid_jvm_gc_mem_capacity",
+            "labels": [],
+            "prometheus_metric_name": "druid_jvm_gc_mem_capacity",
+            "type": "gauge"
+        },
+        "jvm/gc/mem/max": {
+            "description": "druid_jvm_gc_mem_max",
+            "labels": [],
+            "prometheus_metric_name": "druid_jvm_gc_mem_max",
+            "type": "gauge"
+        },
+        "jvm/gc/cpu": {
+            "buckets": [
+                "10",
+                "100",
+                "500",
+                "1000",
+                "2000",
+                "3000",
+                "5000",
+                "7000",
+                "10000",
+                "inf",
+                "sum"
+            ],
+            "description": "Count of CPU time in Nanoseconds spent on garbage collection. Note: jvm/gc/cpu represents the total time over multiple GC cycles; divide by jvm/gc/count to get the mean GC time per cycle",
+            "labels": [],
+            "prometheus_metric_name": "druid_jvm_gc_cpu",
+            "type": "histogram"
+        },
+        "jvm/gc/count": {
+            "description": "Garbage collection count.",
+            "labels": [],
+            "prometheus_metric_name": "druid_jvm_gc_count",
+            "type": "gauge"
+        },
+        "jvm/bufferpool/count": {
+            "description": "Bufferpool count.",
+            "labels": [
+                "bufferpoolName"
+            ],
+            "prometheus_metric_name": "druid_jvm_bufferpool_count",
+            "type": "gauge"
+        },
+        "jvm/bufferpool/used": {
+            "description": "Bufferpool used.",
+            "labels": [
+                "bufferpoolName"
+            ],
+            "prometheus_metric_name": "druid_jvm_bufferpool_used",
+            "type": "gauge"
+        },
+        "jvm/bufferpool/capacity": {
+            "description": "Bufferpool capacity.",
+            "labels": [
+                "bufferpoolName"
+            ],
+            "prometheus_metric_name": "druid_jvm_bufferpool_capacity",
+            "type": "gauge"
+        },
+        "jvm/pool/init": {
+            "description": "Initial pool.",
+            "labels": [],
+            "prometheus_metric_name": "druid_jvm_pool_init",
+            "type": "gauge"
+        },
+        "jvm/pool/used": {
+            "description": "Pool used.",
+            "labels": [],
+            "prometheus_metric_name": "druid_jvm_pool_used",
+            "type": "gauge"
+        },
+        "jvm/pool/committed": {
+            "description": "Committed pool.",
+            "labels": [],
+            "prometheus_metric_name": "druid_jvm_pool_committed",
+            "type": "gauge"
+        },
+        "jvm/pool/max": {
+            "description": "Max pool.",
+            "labels": [],
+            "prometheus_metric_name": "druid_jvm_pool_max",
+            "type": "gauge"
+        },
+        "jvm/mem/init": {
+            "description": "Initial memory.",
+            "labels": [
+                "memKind"
+            ],
+            "prometheus_metric_name": "druid_jvm_mem_init",
+            "type": "gauge"
+        },
+        "jvm/mem/used": {
+            "description": "Used memory.",
+            "labels": [
+                "memKind"
+            ],
+            "prometheus_metric_name": "druid_jvm_mem_used",
+            "type": "gauge"
+        },
+        "jvm/mem/committed": {
+            "description": "Committed memory.",
+            "labels": [
+                "memKind"
+            ],
+            "prometheus_metric_name": "druid_jvm_mem_committed",
+            "type": "gauge"
+        },
+        "jvm/mem/max": {
+            "description": "Max memory.",
+            "labels": [
+                "memKind"
+            ],
+            "prometheus_metric_name": "druid_jvm_mem_max",
+            "type": "gauge"
+        },
+        "jetty/numOpenConnections": {
+            "description": "Number of open jetty connections.",
+            "labels": [],
+            "prometheus_metric_name": "druid_jetty_numOpenConnections",
+            "type": "gauge"
+        },
+        "query/cpu/time": {
+            "buckets": [
+                "10",
+                "100",
+                "500",
+                "1000",
+                "2000",
+                "3000",
+                "5000",
+                "7000",
+                "10000",
+                "inf",
+                "sum"
+            ],
+            "description": "Microseconds of CPU time taken to complete a query",
+            "labels": [
+                "dataSource"
+            ],
+            "prometheus_metric_name": "druid_query_cpu_time",
+            "type": "histogram"
+        },
+        "query/segmentAndCache/time": {
+            "buckets": [
+                "10",
+                "100",
+                "500",
+                "1000",
+                "2000",
+                "3000",
+                "5000",
+                "7000",
+                "10000",
+                "inf",
+                "sum"
+            ],
+            "description": "Milliseconds taken to query individual segment or hit the cache (if it is enabled on the Historical process).",
+            "labels": [
+                "dataSource"
+            ],
+            "prometheus_metric_name": "druid_query_segmentAndCache_time",
+            "type": "histogram"
+        },
+        "query/wait/time": {
+            "buckets": [
+                "10",
+                "100",
+                "500",
+                "1000",
+                "2000",
+                "3000",
+                "5000",
+                "7000",
+                "10000",
+                "inf",
+                "sum"
+            ],
+            "description": "Milliseconds spent waiting for a segment to be scanned.",
+            "labels": [
+                "dataSource"
+            ],
+            "prometheus_metric_name": "druid_query_wait_time",
+            "type": "histogram"
+        },
         "query/time": {
             "prometheus_metric_name": "druid_historical_query_time_ms",
             "type": "histogram",
