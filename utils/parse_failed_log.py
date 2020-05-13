@@ -1,8 +1,6 @@
 #!/usr/bin/python
-# Copyright 2020 Luca Toscano
-#                Filippo Giunchedi
-#                Wikimedia Foundation
-#                Rafa Diaz
+# Copyright 2020 Rafa Diaz
+# 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -35,19 +33,7 @@
 #         },
 #         [..]
 # [..]
-#
-# [..]
-#     "json['service']": {
-#     	[..]
-#         "json['metrics']": {
-#             "prometheus_metric_name": "druid_+json['metric'].replace('/','_')",
-#             "type": "gauge",
-#             "labels": ["dataSource"], if json['dataSource"]
-#             "description": "put the metric separated with spaces here."
-#         },
-#         [..]
-# [..]
-#
+
 
 
 import argparse
