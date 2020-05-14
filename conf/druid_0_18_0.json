@@ -729,6 +729,25 @@
             "prometheus_metric_name": "druid_query_cpu_time",
             "type": "histogram"
         },
+        "query/segment/time": {
+            "buckets": [
+                "10", 
+                "100", 
+                "500", 
+                "1000", 
+                "2000", 
+                "3000", 
+                "5000", 
+                "7000", 
+                "10000", 
+                "inf", 
+                "sum"
+            ], 
+            "description": "Milliseconds taken to query individual segment. Includes time to page in the segment from disk.", 
+            "labels": ["dataSource"], 
+            "prometheus_metric_name": "druid_query_segment_time", 
+            "type": "histogram"
+        },
         "query/segmentAndCache/time": {
             "buckets": [
                 "10",
@@ -908,6 +927,24 @@
             "type": "gauge",
             "labels": [],
             "description": "Number of interrupted queries."
+        },
+        "namespace/cache/heapSizeInBytes": {
+            "description": "druid_namespace_cache_heapSizeInBytes", 
+            "labels": [], 
+            "prometheus_metric_name": "druid_namespace_cache_heapSizeInBytes", 
+            "type": "gauge"
+        },
+        "namespace/cache/numEntries": {
+            "description": "druid_namespace_cache_numEntries", 
+            "labels": "[]", 
+            "prometheus_metric_name": "druid_namespace_cache_numEntries", 
+            "type": "gauge"
+        },
+        "namespace/deltaTasksStarted": {
+            "description": "druid_namespace_deltaTasksStarted", 
+            "labels": "[]", 
+            "prometheus_metric_name": "druid_namespace_deltaTasksStarted", 
+            "type": "gauge"
         }
     },
     "middlemanager": {
