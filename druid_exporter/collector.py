@@ -14,6 +14,8 @@
 # limitations under the License.
 
 import logging
+import queue
+import threading
 
 from collections import defaultdict
 from prometheus_client.core import (CounterMetricFamily, GaugeMetricFamily,
@@ -28,6 +30,17 @@ class DruidCollector(object):
             'druid_scrape_duration_seconds', 'Druid scrape duration')
 
     def __init__(self, metrics_config):
+
+        # The ingestion of the datapoints is separated from their processing,
+        # to separate concerns and avoid unnecessary slowdowns for Druid
+        # daemons sending data.
+        # Only one thread de-queues and process datapoints, in this way we
+        # don't really need any special locking to guarantee consistency.
+        # Since this thread is not I/O bound it doesn't seem the case to
+        # use a gevent's greenlet, but more tests might prove the contrary.
+        self.datapoints_queue = queue.Queue()
+        threading.Thread(target=self.process_queued_datapoints).start()
+
         # Datapoints successfully registered
         self.datapoints_registered = 0
 
@@ -230,10 +243,15 @@ class DruidCollector(object):
                       .format(datapoint))
             return
 
-        metric_name = str(datapoint['metric'])
-        if self.metrics_config[daemon][metric_name]['type'] == 'histogram':
-            self.store_histogram(datapoint)
-        else:
-            self.store_counter(datapoint)
+        self.datapoints_queue.put((daemon, datapoint))
 
-        self.datapoints_registered += 1
+    def process_queued_datapoints(self):
+        while True:
+            (daemon, datapoint) = self.datapoints_queue.get()
+            metric_name = str(datapoint['metric'])
+            if self.metrics_config[daemon][metric_name]['type'] == 'histogram':
+                self.store_histogram(datapoint)
+            else:
+                self.store_counter(datapoint)
+
+            self.datapoints_registered += 1
