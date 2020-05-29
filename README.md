@@ -113,3 +113,18 @@ be confusing to see at first (expecially if metrics are aggregated) so the curre
 leader are restarted. Future versions of this project might contain a fix, pull
 requests are welcome!
 
+## Performance considerations
+
+In https://github.com/wikimedia/operations-software-druid_exporter/issues/11 some users
+brought up an interesting use case for the exporter, namely handling peaks of 1500 datapoints/s
+sent from Druid brokers. The exporter's code was refactored to be able to scale more
+(if you are curious, check [this commit](https://github.com/wikimedia/operations-software-druid_exporter/commit/f22c6d9f8707ae2d274db9b10669b971beed64ab)), but it wasn't enough, since users kept reporting timeouts from Druid daemons while sending
+datapoints to the exporter. There are some recommendations to follow:
+* Try to use a dedicated exporter instance for daemons sending high volumes of datapoints.
+* Try to tune the HTTP emitter's settings via https://druid.apache.org/docs/latest/configuration/index.html#http-emitter-module
+  (if the Druid version that you are running supports them).
+On our side, we are working on a solution that should be simple and flexible, namely use the
+[https://druid.apache.org/docs/latest/development/extensions-contrib/kafka-emitter.html](Kafka)
+emitter instead of the HTTP emitter. The idea is to instruct Druid daemons to push datapoints
+to a Kafka topic, and then to point the exporter to it. The code is not ready yet,
+please refer to the aforementioned issue for updates.
