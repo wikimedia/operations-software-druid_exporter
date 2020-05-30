@@ -57,6 +57,14 @@ The druid prometheus exporter accepts HTTP POST data, inspects it and stores/agg
 every supported datapoint into a data structure. It then formats the
 data on the fly to Prometheus metrics when a GET /metrics is requested.
 
+The exporter is also able to pull metrics from a Kafka topic, when Druid is configured to do so:
+
+https://druid.apache.org/docs/latest/development/extensions-contrib/kafka-emitter.html
+
+The Kafka support is optional and should be used when the number of metrics/datapoints emitted
+by Druid is very high (rule of thumb could be around 1000 datapoints/s). Please check the section
+about performance considerations below for more info.
+
 This exporter is supposed to be run on each host running one or multiple Druid daemons.
 
 ## Supported metrics and labels
@@ -117,14 +125,16 @@ requests are welcome!
 
 In https://github.com/wikimedia/operations-software-druid_exporter/issues/11 some users
 brought up an interesting use case for the exporter, namely handling peaks of 1500 datapoints/s
-sent from Druid brokers. The exporter's code was refactored to be able to scale more
+sent from Druid brokers (one can check the rate of datapoints/s via the
+`druid_exporter_datapoints_registered_total metric`).
+
+The exporter's code was refactored to be able to scale more
 (if you are curious, check [this commit](https://github.com/wikimedia/operations-software-druid_exporter/commit/f22c6d9f8707ae2d274db9b10669b971beed64ab)), but it wasn't enough, since users kept reporting timeouts from Druid daemons while sending
 datapoints to the exporter. There are some recommendations to follow:
 * Try to use a dedicated exporter instance for daemons sending high volumes of datapoints.
 * Try to tune the HTTP emitter's settings via https://druid.apache.org/docs/latest/configuration/index.html#http-emitter-module
   (if the Druid version that you are running supports them).
-On our side, we are working on a solution that should be simple and flexible, namely use the
-[https://druid.apache.org/docs/latest/development/extensions-contrib/kafka-emitter.html](Kafka)
-emitter instead of the HTTP emitter. The idea is to instruct Druid daemons to push datapoints
-to a Kafka topic, and then to point the exporter to it. The code is not ready yet,
-please refer to the aforementioned issue for updates.
+If the above is not enough, the exporter can be configured to also pull datapoints from
+a Kafka topic (see [https://druid.apache.org/docs/latest/development/extensions-contrib/kafka-emitter.html](Kafka)). With this configuration, the exporter will ingest datapoints coming via
+HTTP and Kafka at the same time. An ideal solution is to force Druid daemons emitting too many
+datapoints/s to use the KafkaEmitter, and the other ones to use the HTTPEmitter.

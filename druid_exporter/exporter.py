@@ -122,12 +122,41 @@ def main():
                         help='Enable debug logging')
     parser.add_argument('-e', '--encoding', default='utf-8',
                         help='Encoding of the Druid POST JSON data.')
+    kafka_parser = parser.add_argument_group('kafka',
+                                             'Optional configuration for datapoints emitted '
+                                             'to a topic via the Druid Kafka Emitter extension.')
+    kafka_parser.add_argument('-t', '--kafka-topic',
+                              help='Pull datapoints from a given Kafka topic.')
+    kafka_parser.add_argument('-b', '--kafka-bootstrap-servers', nargs='+',
+                              help='Pull datapoints from a given list of Kafka brokers.')
+    kafka_parser.add_argument('-g', '--kafka-consumer-group-id',
+                              help='Pull datapoints from Kafka using this Consumer group id.')
+
     args = parser.parse_args()
 
     if args.debug:
         logging.basicConfig(level=logging.DEBUG)
     else:
         logging.basicConfig(level=logging.WARNING)
+
+    kafka_args = (args.kafka_topic,
+                  args.kafka_bootstrap_servers,
+                  args.kafka_consumer_group_id)
+
+    # Check if a Kafka config is provided
+    if any(kafka_args):
+        if not all(kafka_args):
+            argparse.ArgumentParser.error('Kafka configuration incomplete, '
+                                          'please provide a topic, one or more brokers '
+                                          'as bootstrap-servers and the consumer group id.')
+        else:
+            kafka_config = {}
+            kafka_config['topic'] = args.kafka_topic
+            kafka_config['bootstrap_servers'] = args.kafka_bootstrap_servers
+            kafka_config['group_id'] = args.kafka_consumer_group_id
+            log.info('Using Kafka config: {}'.format(kafka_config))
+    else:
+        kafka_config = None
 
     collect_metrics_from = []
 
@@ -143,7 +172,8 @@ def main():
     log.info('Checking consistency of metrics config file..')
     check_metrics_config_file_consistency(metrics_config)
 
-    druid_collector = collector.DruidCollector(metrics_config)
+    druid_collector = collector.DruidCollector(
+        metrics_config, kafka_config)
     REGISTRY.register(druid_collector)
     prometheus_app = make_wsgi_app()
     druid_wsgi_app = DruidWSGIApp(args.uri, druid_collector,

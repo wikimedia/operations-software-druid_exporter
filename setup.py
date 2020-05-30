@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='druid_exporter',
-      version='0.9',
+      version='0.10',
       description='Prometheus exporter for Druid',
       url='https://github.com/wikimedia/operations-software-druid_exporter',
       author='Luca Toscano',
@@ -12,6 +12,9 @@ setup(name='druid_exporter',
           'prometheus-client>=0.5.0',
           'gevent',
       ],
+      extras_require = {
+          'kafka': ['kafka-python']
+      },
       entry_points={
           'console_scripts': [
               'druid_exporter = druid_exporter.exporter:main'

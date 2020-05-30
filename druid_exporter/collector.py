@@ -24,12 +24,17 @@ from prometheus_client.core import (CounterMetricFamily, GaugeMetricFamily,
 
 log = logging.getLogger(__name__)
 
+try:
+    from kafka import KafkaConsumer
+except ImportError:
+    KafkaConsumer = None
+
 
 class DruidCollector(object):
     scrape_duration = Summary(
             'druid_scrape_duration_seconds', 'Druid scrape duration')
 
-    def __init__(self, metrics_config):
+    def __init__(self, metrics_config, kafka_config=None):
 
         # The ingestion of the datapoints is separated from their processing,
         # to separate concerns and avoid unnecessary slowdowns for Druid
@@ -40,6 +45,17 @@ class DruidCollector(object):
         # use a gevent's greenlet, but more tests might prove the contrary.
         self.datapoints_queue = queue.Queue()
         threading.Thread(target=self.process_queued_datapoints).start()
+
+        # if a Kafka config is provided, create a dedicated thread
+        # that pulls datapoints from a Kafka topic.
+        # The thread will then push datapoints to the same queue that
+        # the HTTP server uses. In this way the exporter allows a mixed
+        # configuration for Druid Brokers between HTTPEmitter and
+        # KafkaEmitter (for daemons emitting too many datapoints/s).
+        if kafka_config and KafkaConsumer:
+            threading.Thread(
+                target=self.pull_datapoints_from_kafka,
+                args=(kafka_config,)).start()
 
         # Datapoints successfully registered
         self.datapoints_registered = 0
@@ -255,3 +271,25 @@ class DruidCollector(object):
                 self.store_counter(datapoint)
 
             self.datapoints_registered += 1
+
+    def pull_datapoints_from_kafka(self, kafka_config):
+        consumer = KafkaConsumer(
+            kafka_config['topic'],
+            group_id=kafka_config['group_id'],
+            bootstrap_servers=kafka_config['bootstrap_servers'])
+
+        while True:
+            consumer.poll()
+            for message in consumer:
+                try:
+                    json_message = json.loads(message.value.decode())
+                    log.debug('Datapoint from kafka: %s', json_message)
+                    if type(json_message) == list:
+                        for datapoint in json_message:
+                            self.register_datapoint(datapoint)
+                    else:
+                        self.register_datapoint(json_message)
+                except json.JSONDecodeError:
+                    log.exception("Failed to decode message from Kafka, skipping..")
+                except Exception as e:
+                    log.exception("Generic exception while pulling datapoints from Kafka")
