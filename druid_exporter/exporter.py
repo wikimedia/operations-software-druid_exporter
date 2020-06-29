@@ -179,7 +179,7 @@ def main():
     druid_wsgi_app = DruidWSGIApp(args.uri, druid_collector,
                                   prometheus_app, args.encoding)
 
-    httpd = WSGIServer((address, int(port)), druid_wsgi_app)
+    httpd = WSGIServer(listener=(address, int(port)), application=druid_wsgi_app, log=log)
     httpd.serve_forever()
 
 
