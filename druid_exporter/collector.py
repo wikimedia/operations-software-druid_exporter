@@ -44,7 +44,11 @@ class DruidCollector(object):
         # Since this thread is not I/O bound it doesn't seem the case to
         # use a gevent's greenlet, but more tests might prove the contrary.
         self.datapoints_queue = queue.Queue()
-        threading.Thread(target=self.process_queued_datapoints).start()
+        self.stop_threads = threading.Event()
+
+        threading.Thread(
+                target=self.process_queued_datapoints,
+                args=(self.stop_threads,)).start()
 
         # if a Kafka config is provided, create a dedicated thread
         # that pulls datapoints from a Kafka topic.
@@ -55,7 +59,7 @@ class DruidCollector(object):
         if kafka_config and KafkaConsumer:
             threading.Thread(
                 target=self.pull_datapoints_from_kafka,
-                args=(kafka_config,)).start()
+                args=(kafka_config,self.stop_threads)).start()
 
         # Datapoints successfully registered
         self.datapoints_registered = 0
@@ -75,6 +79,9 @@ class DruidCollector(object):
         # List of metrics to collect/expose via the exporter
         self.metrics_config = metrics_config
         self.supported_daemons = self.metrics_config.keys()
+
+    def stop_running_threads(self):
+        self.stop_threads.set()
 
     @staticmethod
     def sanitize_field(datapoint_field):
@@ -117,7 +124,7 @@ class DruidCollector(object):
                 except KeyError as e:
                     log.error('Missing label {} for datapoint {} (expected labels: {}), '
                               'dropping it. Please check your metric configuration file.'
-                              .format(label, metric_labels, datapoint))
+                              .format(label, datapoint, metric_labels))
                     return
 
         # Convert the list of labels to a tuple to allow indexing
@@ -261,8 +268,10 @@ class DruidCollector(object):
 
         self.datapoints_queue.put((daemon, datapoint))
 
-    def process_queued_datapoints(self):
-        while True:
+    def process_queued_datapoints(self, stop_threads):
+        log.debug('Process datapoints thread starting..')
+
+        while True and not stop_threads.isSet():
             (daemon, datapoint) = self.datapoints_queue.get()
             metric_name = str(datapoint['metric'])
             if self.metrics_config[daemon][metric_name]['type'] == 'histogram':
@@ -272,13 +281,17 @@ class DruidCollector(object):
 
             self.datapoints_registered += 1
 
-    def pull_datapoints_from_kafka(self, kafka_config):
+        log.debug('Process datapoints thread shutting down..')
+
+    def pull_datapoints_from_kafka(self, kafka_config, stop_threads):
+        log.debug('Kafka datapoints puller thread starting..')
+
         consumer = KafkaConsumer(
             kafka_config['topic'],
             group_id=kafka_config['group_id'],
             bootstrap_servers=kafka_config['bootstrap_servers'])
 
-        while True:
+        while True and not stop_threads.isSet():
             consumer.poll()
             for message in consumer:
                 try:
@@ -293,3 +306,5 @@ class DruidCollector(object):
                     log.exception("Failed to decode message from Kafka, skipping..")
                 except Exception as e:
                     log.exception("Generic exception while pulling datapoints from Kafka")
+
+        log.debug('Kafka datapoints puller thread shutting down..')

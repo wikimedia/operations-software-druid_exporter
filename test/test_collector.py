@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import time
 import unittest
 
 from collections import defaultdict
@@ -119,6 +120,24 @@ class TestDruidCollector(unittest.TestCase):
         }
         self.collector = DruidCollector(metrics_config)
 
+    def tearDown(self):
+        self.collector.stop_running_threads()
+
+        # The thread processing datapoints might be stuck in queue.get(),
+        # so we insert a fake datapoint to unblock it (so it can check the stop thread flag).
+        datapoint = {'feed': 'metrics', 'service': 'druid/historical', 'dataSource': 'test',
+                     'metric': 'query/time', 'value': 42}
+        self.register_datapoint(datapoint)
+
+    def register_datapoint(self, datapoint):
+        """Wrapper around the real register_datapoint to insert a little delay.
+        """
+        self.collector.register_datapoint(datapoint)
+
+        # Give some time to the thread that processes datapoints
+        # to catch up.
+        time.sleep(0.1)
+
     def test_check_metrics_config_file_consistency(self):
         """Test if the config file checker raises the appropriate validation errors.
         """
@@ -197,7 +216,7 @@ class TestDruidCollector(unittest.TestCase):
         """
         datapoint = {'feed': 'metrics', 'service': 'druid/historical', 'dataSource': 'test',
                      'metric': 'query/time', 'value': 42}
-        self.collector.register_datapoint(datapoint)
+        self.register_datapoint(datapoint)
         expected_struct = {
             'query/time': {
                 'historical': {
@@ -209,7 +228,7 @@ class TestDruidCollector(unittest.TestCase):
 
         datapoint = {'feed': 'metrics', 'service': 'druid/historical', 'dataSource': 'test',
                      'metric': 'query/time', 'value': 5}
-        self.collector.register_datapoint(datapoint)
+        self.register_datapoint(datapoint)
         for bucket in expected_struct['query/time']['historical'][('test',)]:
             if bucket != 'sum':
                 expected_struct['query/time']['historical'][('test',)][bucket] += 1
@@ -219,7 +238,7 @@ class TestDruidCollector(unittest.TestCase):
 
         datapoint = {'feed': 'metrics', 'service': 'druid/historical', 'dataSource': 'test2',
                      'metric': 'query/time', 'value': 5}
-        self.collector.register_datapoint(datapoint)
+        self.register_datapoint(datapoint)
         expected_result['query/time']['historical'][('test2',)] = {
             '10': 1, '100': 1, '500': 1, '1000': 1, '2000': 1, '3000': 1, '5000': 1, '7000': 1,
             '10000': 1, 'inf': 1, 'sum': 5.0}
@@ -227,7 +246,7 @@ class TestDruidCollector(unittest.TestCase):
 
         datapoint = {'feed': 'metrics', 'service': 'druid/broker', 'dataSource': 'test',
                      'metric': 'query/time', 'value': 42}
-        self.collector.register_datapoint(datapoint)
+        self.register_datapoint(datapoint)
         expected_result['query/time']['broker'] = {
                 ('test',): {'10': 0, '100': 1, '500': 1, '1000': 1, '2000': 1, '3000': 1,
                             '5000': 1, '7000': 1, '10000': 1, 'inf': 1, 'sum': 42.0}}
@@ -235,7 +254,7 @@ class TestDruidCollector(unittest.TestCase):
 
         datapoint = {'feed': 'metrics', 'service': 'druid/broker', 'dataSource': 'test',
                      'metric': 'query/time', 'value': 600}
-        self.collector.register_datapoint(datapoint)
+        self.register_datapoint(datapoint)
         for bucket in expected_struct['query/time']['broker'][('test',)]:
             if bucket == 'sum':
                 expected_struct['query/time']['broker'][('test',)][bucket] += 600
@@ -245,7 +264,7 @@ class TestDruidCollector(unittest.TestCase):
 
         datapoint = {'feed': 'metrics', 'service': 'druid/broker', 'dataSource': 'test2',
                      'metric': 'query/time', 'value': 5}
-        self.collector.register_datapoint(datapoint)
+        self.register_datapoint(datapoint)
         expected_result['query/time']['broker'][('test2',)] = {
             '10': 1, '100': 1, '500': 1, '1000': 1, '2000': 1, '3000': 1, '5000': 1, '7000': 1,
             '10000': 1, 'inf': 1, 'sum': 5.0}
@@ -258,7 +277,7 @@ class TestDruidCollector(unittest.TestCase):
         # First datapoint should add the missing layout to the data structure
         datapoint = {'feed': 'metrics', 'service': 'druid/historical', 'dataSource': 'test',
                      'metric': 'segment/used', 'tier': '_default_tier', 'value': 42}
-        self.collector.register_datapoint(datapoint)
+        self.register_datapoint(datapoint)
         expected_struct = {'segment/used': {'historical': {('_default_tier', 'test'): 42.0}}}
         expected_result = defaultdict(lambda: {}, expected_struct)
         self.assertEqual(self.collector.counters, expected_result)
@@ -267,7 +286,7 @@ class TestDruidCollector(unittest.TestCase):
         # the missing layout without touching the rest.
         datapoint = {'feed': 'metrics', 'service': 'druid/historical', 'dataSource': 'test',
                      'metric': 'query/cache/total/evictions', 'value': 142}
-        self.collector.register_datapoint(datapoint)
+        self.register_datapoint(datapoint)
         expected_result['query/cache/total/evictions'] = {'historical': {('test',): 142.0}}
         self.assertEqual(self.collector.counters, expected_result)
 
@@ -275,21 +294,21 @@ class TestDruidCollector(unittest.TestCase):
         # add a key to the already existent dictionary.
         datapoint = {'feed': 'metrics', 'service': 'druid/historical', 'dataSource': 'test2',
                      'metric': 'segment/count', 'tier': '_default_tier', 'value': 543}
-        self.collector.register_datapoint(datapoint)
+        self.register_datapoint(datapoint)
         expected_result['segment/count'] = {'historical': {('_default_tier', 'test2'): 543.0}}
         self.assertEqual(self.collector.counters, expected_result)
 
         # Fourth datapoint for an already seen metric but different daemon
         datapoint = {'feed': 'metrics', 'service': 'druid/coordinator', 'dataSource': 'test',
                      'metric': 'segment/count', 'value': 111}
-        self.collector.register_datapoint(datapoint)
+        self.register_datapoint(datapoint)
         expected_result['segment/count']['coordinator'] = {('test',): 111.0}
         self.assertEqual(self.collector.counters, expected_result)
 
         # Fifth datapoint should override a pre-existent value
         datapoint = {'feed': 'metrics', 'service': 'druid/historical', 'dataSource': 'test',
                      'metric': 'segment/used', 'tier': '_default_tier', 'value': 11}
-        self.collector.register_datapoint(datapoint)
+        self.register_datapoint(datapoint)
         expected_result['segment/used']['historical'][('_default_tier', 'test')] = 11.0
         self.assertEqual(self.collector.counters, expected_result)
 
@@ -301,7 +320,7 @@ class TestDruidCollector(unittest.TestCase):
             "service": "druid/historical", "host": "druid1001.eqiad.wmnet:8083",
             "metric": "segment/scan/pending", "value": 0}
         datapoints_registered = self.collector.datapoints_registered
-        self.collector.register_datapoint(datapoint)
+        self.register_datapoint(datapoint)
         self.assertEqual(self.collector.datapoints_registered, datapoints_registered)
 
     def test_datapoint_without_configured_label(self):
@@ -313,12 +332,12 @@ class TestDruidCollector(unittest.TestCase):
         datapoint = {
             'feed': 'metrics', 'service': 'druid/historical',
             'metric': 'query/time', 'value': 42}
-        self.collector.register_datapoint(datapoint)
+        self.register_datapoint(datapoint)
 
         # Missing label "tier"
         datapoint = {'feed': 'metrics', 'service': 'druid/historical', 'dataSource': 'test',
                      'metric': 'segment/used', 'value': 42}
-        self.collector.register_datapoint(datapoint)
+        self.register_datapoint(datapoint)
 
     def test_add_one_datapoint_for_each_metric(self):
         """Add one datapoint for each metric and make sure that they render correctly
@@ -426,11 +445,11 @@ class TestDruidCollector(unittest.TestCase):
         # The following datapoint registration batch should not generate
         # any exception (breaking the test).
         for datapoint in datapoints:
-            self.collector.register_datapoint(datapoint)
+            self.register_datapoint(datapoint)
 
         # Running it twice should not produce more metrics
         for datapoint in datapoints:
-            self.collector.register_datapoint(datapoint)
+            self.register_datapoint(datapoint)
 
         collected_metrics = 0
         prometheus_metric_samples = []
@@ -521,6 +540,6 @@ class TestDruidCollector(unittest.TestCase):
         ]
 
         for datapoint in datapoints:
-            self.collector.register_datapoint(datapoint)
+            self.register_datapoint(datapoint)
 
         self.assertEqual(self.collector.datapoints_registered, 3)
