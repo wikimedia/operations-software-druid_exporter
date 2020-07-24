@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import logging
 import queue
 import threading
@@ -56,10 +57,15 @@ class DruidCollector(object):
         # the HTTP server uses. In this way the exporter allows a mixed
         # configuration for Druid Brokers between HTTPEmitter and
         # KafkaEmitter (for daemons emitting too many datapoints/s).
-        if kafka_config and KafkaConsumer:
-            threading.Thread(
-                target=self.pull_datapoints_from_kafka,
-                args=(kafka_config,self.stop_threads)).start()
+        if kafka_config:
+            if KafkaConsumer:
+                threading.Thread(
+                    target=self.pull_datapoints_from_kafka,
+                    args=(kafka_config, self.stop_threads)).start()
+            else:
+                log.error('A Kafka configuration was provided, but it seems '
+                          'that the Kafka client library is not available. '
+                          'Please install the correct dependencies.')
 
         # Datapoints successfully registered
         self.datapoints_registered = 0
