@@ -84,7 +84,7 @@ class DruidCollector(object):
 
         # List of metrics to collect/expose via the exporter
         self.metrics_config = metrics_config
-        self.supported_daemons = self.metrics_config.keys()
+        self.supported_daemons = list(self.metrics_config.keys())
 
     def stop_running_threads(self):
         self.stop_threads.set()
@@ -268,8 +268,9 @@ class DruidCollector(object):
                 datapoint['metric'] not in self.metrics_config[daemon].keys()):
             log.debug("The following datapoint is not supported, either "
                       "because the 'feed' field is not 'metrics' or "
-                      "the metric itself is not supported: {}"
-                      .format(datapoint))
+                      "the daemon name ({}) is not listed in the supported ones ({}) or "
+                      "the metric itself is not listed in the exporter's config file: {}"
+                      .format(daemon, self.supported_daemons, datapoint))
             return
 
         self.datapoints_queue.put((daemon, datapoint))
