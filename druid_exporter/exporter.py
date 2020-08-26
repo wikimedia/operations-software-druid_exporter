@@ -65,7 +65,7 @@ def check_metrics_config_file_consistency(json_config):
         raise RuntimeError('Validation error: empty config file.')
     # The first level of nesting should be related to Druid daemon names
     druid_daemon_names = [
-        'middlemanager', 'historical', 'peon', 'broker', 'coordinator', 'overlord']
+        'middlemanager', 'historical', 'peon', 'broker', 'coordinator', 'overlord', 'router']
     required_config_fields = [
         'prometheus_metric_name', 'labels', 'type', 'description'
     ]
