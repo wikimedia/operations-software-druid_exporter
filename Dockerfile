@@ -7,6 +7,7 @@ COPY setup.py /exporter/setup.py
 
 WORKDIR /exporter
 
+RUN apk add build-base
 RUN python ./setup.py install
 
 EXPOSE 8000
