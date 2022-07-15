@@ -21,7 +21,7 @@ import sys
 
 from druid_exporter import collector
 from prometheus_client import generate_latest, make_wsgi_app, REGISTRY
-from wsgiref.simple_server import make_server
+from gevent.pywsgi import WSGIServer
 
 log = logging.getLogger(__name__)
 
@@ -86,7 +86,7 @@ def main():
     druid_wsgi_app = DruidWSGIApp(args.uri, druid_collector,
                                   prometheus_app, args.encoding)
 
-    httpd = make_server(address, int(port), druid_wsgi_app)
+    httpd = WSGIServer((address, int(port)), druid_wsgi_app)
     httpd.serve_forever()
 
 if __name__ == "__main__":

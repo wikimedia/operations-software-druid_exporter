@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='druid_exporter',
-      version='0.6',
+      version='0.7',
       description='Prometheus exporter for Druid',
       url='https://github.com/wikimedia/operations-software-druid_exporter',
       author='Luca Toscano',
@@ -10,6 +10,7 @@ setup(name='druid_exporter',
       packages=['druid_exporter'],
       install_requires=[
           'prometheus-client==0.7.1',
+          'gevent',
       ],
       entry_points={
           'console_scripts': [
