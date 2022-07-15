@@ -15,6 +15,8 @@
 
 import re
 import logging
+import queue
+import threading
 
 from prometheus_client.core import (Counter, Gauge, Histogram, Summary)
 
@@ -212,6 +214,9 @@ class DruidCollector(object):
     datapoints_processed = Counter('druid_exporter_datapoints_processed_count', '')
 
     def __init__(self):
+        self.datapoints_queue = queue.Queue()
+        threading.Thread(target=self.process_queued_datapoints).start()
+        
         self.supported_metrics = {
             'coordinator': {
                 **JETTY_METRICS,
@@ -280,6 +285,11 @@ class DruidCollector(object):
         log.debug("final metric_name: {}".format(metric_name))
 
         return 'druid_' + daemon + '_' + metric_name
+    
+    def process_queued_datapoints(self):
+        while True:
+            datapoint = self.datapoints_queue.get()
+            self.process_datapoint(datapoint)
 
     def process_datapoint(self, datapoint):
         if (datapoint['feed'] != 'metrics'):

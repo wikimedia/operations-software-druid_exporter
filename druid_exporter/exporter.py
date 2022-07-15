@@ -48,7 +48,7 @@ class DruidWSGIApp(object):
                 # a specific endpoint stated in the logs (this tool).
                 for datapoint in datapoints:
                     log.debug("Processing datapoint: {}".format(datapoint))
-                    self.druid_collector.process_datapoint(datapoint)
+                    self.druid_collector.datapoints_queue.put(datapoint)
                 status = '200 OK'
             except Exception as e:
                 log.exception('Error while processing the following POST data')
