@@ -21,7 +21,7 @@ import sys
 
 from druid_exporter import collector
 from prometheus_client import generate_latest, make_wsgi_app, REGISTRY
-from wsgiref.simple_server import make_server
+from gevent.pywsgi import WSGIServer
 
 log = logging.getLogger(__name__)
 
@@ -48,7 +48,7 @@ class DruidWSGIApp(object):
                 # a specific endpoint stated in the logs (this tool).
                 for datapoint in datapoints:
                     log.debug("Processing datapoint: {}".format(datapoint))
-                    self.druid_collector.process_datapoint(datapoint)
+                    self.druid_collector.datapoints_queue.put(datapoint)
                 status = '200 OK'
             except Exception as e:
                 log.exception('Error while processing the following POST data')
@@ -86,7 +86,7 @@ def main():
     druid_wsgi_app = DruidWSGIApp(args.uri, druid_collector,
                                   prometheus_app, args.encoding)
 
-    httpd = make_server(address, int(port), druid_wsgi_app)
+    httpd = WSGIServer((address, int(port)), druid_wsgi_app)
     httpd.serve_forever()
 
 if __name__ == "__main__":
