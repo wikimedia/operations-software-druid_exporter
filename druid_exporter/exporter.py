@@ -22,11 +22,11 @@ import sys
 from druid_exporter import collector
 from prometheus_client import generate_latest, make_wsgi_app, REGISTRY
 from gevent.pywsgi import WSGIServer
+from wsgigzip import gzip
 
 log = logging.getLogger(__name__)
 
 class DruidWSGIApp(object):
-
     def __init__(self, post_uri, druid_collector, prometheus_app, encoding):
         self.prometheus_app = prometheus_app
         self.druid_collector = druid_collector
@@ -59,6 +59,14 @@ class DruidWSGIApp(object):
         return ''
 
 
+def with_gzip_compression(handle_cb):
+    @gzip(compress_level=6)
+    def handle(environ, start_response):
+        return handle_cb(environ, start_response)
+
+    return handle
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-l', '--listen', metavar='ADDRESS',
@@ -86,7 +94,7 @@ def main():
     druid_wsgi_app = DruidWSGIApp(args.uri, druid_collector,
                                   prometheus_app, args.encoding)
 
-    httpd = WSGIServer((address, int(port)), druid_wsgi_app)
+    httpd = WSGIServer((address, int(port)), with_gzip_compression(druid_wsgi_app))
     httpd.serve_forever()
 
 if __name__ == "__main__":
