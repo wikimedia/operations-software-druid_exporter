@@ -11,6 +11,7 @@ setup(name='druid_exporter',
       install_requires=[
           'prometheus-client==0.7.1',
           'gevent',
+          'wsgigzip'
       ],
       entry_points={
           'console_scripts': [
