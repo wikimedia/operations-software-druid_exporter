@@ -1,3 +1,9 @@
+prometheus-druid-exporter (0.8-2) bullseye-wikimedia; urgency=medium
+
+  * Rebuild for bullseye
+
+ -- Moritz Mühlenhoff <moritz@wikimedia.org>  Thu, 23 Mar 2023 09:35:21 +0100
+
 prometheus-druid-exporter (0.8-1) unstable; urgency=low
 
   * Upgrade to upstream version 0.8.

@@ -6,10 +6,7 @@ export PYBUILD_NAME=druid_exporter
 DEBPKGNAME ?= $(shell dpkg-parsechangelog | sed -n -e 's/^Source: //p')
 
 %:
-	dh $@ --with python3,systemd --buildsystem=pybuild
-
-override_dh_installinit:
-	true
+	dh $@ --with python3 --buildsystem=pybuild
 
 override_dh_auto_install:
 	dh_auto_install
