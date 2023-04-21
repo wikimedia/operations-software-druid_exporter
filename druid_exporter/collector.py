@@ -111,6 +111,7 @@ QUERY_COUNT_STATS = {
     'query/failed/count': {**QUERY_COUNT_METRIC},
     'query/interrupted/count': {**QUERY_COUNT_METRIC},
     'query/success/count': {**QUERY_COUNT_METRIC},
+    'query/timeout/count': {**QUERY_COUNT_METRIC},
 }
 
 SEGMENT_METRICS = {
