@@ -89,3 +89,14 @@ be confusing to see at first (expecially if metrics are aggregated) so the curre
 leader are restarted. Future versions of this project might contain a fix, pull
 requests are welcome!
 
+
+## Build instructions
+
+`ssh` onto a build host, and run the following commands:
+```
+$ git clone https://gerrit.wikimedia.org/r/operations/software/druid_exporter
+$ cd druid_exporter
+$ git checkout debian
+$ tar czf ../prometheus-druid-exporter_0.8.orig.tar.gz .
+$ DIST=bookworm-wikimedia pdebuild
+```

@@ -9,7 +9,7 @@ Build-Depends: debhelper-compat (= 13),
   python3-nose,
   python3-prometheus-client,
   python3-requests
-Standards-Version: 3.9.8
+Standards-Version: 3.11.2
 
 Package: prometheus-druid-exporter
 Architecture: all

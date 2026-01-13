@@ -1,3 +1,9 @@
+prometheus-druid-exporter (0.8-3) bookworm-wikimedia; urgency=medium
+
+  * Rebuild for bookworm
+
+ -- Balthazar Rouberol <brouberol@wikimedia.org>  Tue, 13 Jan 2026 10:35:00 +0100
+
 prometheus-druid-exporter (0.8-2) bullseye-wikimedia; urgency=medium
 
   * Rebuild for bullseye
